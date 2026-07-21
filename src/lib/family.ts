@@ -169,6 +169,34 @@ export async function getRankedLeaderboard(limit?: number): Promise<RankedPlayer
   return limit ? source.slice(0, limit) : source;
 }
 
+// Record all-time de points classés (HighestRankedPoints côté api.rnt.dev),
+// pas un classement de saison — pas d'équivalent en démo, on retombe juste
+// sur une liste vide si l'API n'a pas encore synchronisé ces valeurs.
+async function buildAllTimeRankedLeaderboard(): Promise<RankedPlayer[] | null> {
+  const ranked = await getFamilyRanked();
+  if (!ranked) return null;
+
+  const withPeak = Object.entries(ranked.players).filter(([, p]) => p.highest_ranked_pts != null);
+  if (withPeak.length === 0) return null;
+
+  return withPeak
+    .map(([tag, p]) => ({ tag, ...p }))
+    .sort((a, b) => (b.highest_ranked_pts ?? 0) - (a.highest_ranked_pts ?? 0))
+    .map((p, i) => ({
+      rank: i + 1,
+      tag: p.tag,
+      name: p.name,
+      club: p.club,
+      tier: p.highest_ranked_tier ?? "",
+      elo: p.highest_ranked_pts ?? 0,
+      color: colorFromSeed(p.tag),
+    }));
+}
+
+export async function getAllTimeRankedLeaderboard(): Promise<RankedPlayer[]> {
+  return (await buildAllTimeRankedLeaderboard()) ?? [];
+}
+
 export async function getHomeRankedPreview() {
   const real = await buildRankedLeaderboard();
   if (real) return real.slice(0, 5);

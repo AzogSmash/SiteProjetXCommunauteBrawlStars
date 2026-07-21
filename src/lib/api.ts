@@ -22,6 +22,8 @@ export type ApiRankedPlayer = {
   club: string | null;
   ranked_pts: number;
   ranked_tier: string;
+  highest_ranked_pts: number | null;
+  highest_ranked_tier: string | null;
 };
 
 export type ApiRanked = {

@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { ClassementTabs } from "@/components/ClassementTabs";
-import { getRankedLeaderboard, getPlayersLeaderboard } from "@/lib/family";
+import { getRankedLeaderboard, getAllTimeRankedLeaderboard, getPlayersLeaderboard } from "@/lib/family";
 import { getFamilyClassement1v1, getFamilyClassementCasino } from "@/lib/api";
 
 export default async function ClassementPage({
@@ -9,9 +9,10 @@ export default async function ClassementPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ tab }, ranked, trophees, duel1v1, casino] = await Promise.all([
+  const [{ tab }, ranked, rankedAllTime, trophees, duel1v1, casino] = await Promise.all([
     searchParams,
     getRankedLeaderboard(),
+    getAllTimeRankedLeaderboard(),
     getPlayersLeaderboard(),
     getFamilyClassement1v1(),
     getFamilyClassementCasino(),
@@ -29,6 +30,7 @@ export default async function ClassementPage({
         <Panel title="Classements" linkLabel="Voir les clubs" linkHref="/clubs">
           <ClassementTabs
             ranked={ranked}
+            rankedAllTime={rankedAllTime}
             trophees={trophees}
             duel1v1={duel1v1 ?? []}
             casino={casino ?? []}

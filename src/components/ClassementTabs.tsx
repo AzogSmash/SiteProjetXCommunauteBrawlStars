@@ -12,6 +12,7 @@ import type { Api1v1Player, ApiCasinoPlayer } from "@/lib/api";
 
 const TABS = [
   { id: "ranked", label: "Ranked" },
+  { id: "ranked-all-time", label: "Ranked all-time" },
   { id: "trophees", label: "Trophées" },
   { id: "1v1", label: "1v1" },
   { id: "casino", label: "Casino" },
@@ -41,12 +42,14 @@ function isTabId(value: string | undefined): value is TabId {
 
 export function ClassementTabs({
   ranked,
+  rankedAllTime,
   trophees,
   duel1v1,
   casino,
   initialTab,
 }: {
   ranked: RankedPlayer[];
+  rankedAllTime: RankedPlayer[];
   trophees: Player[];
   duel1v1: Api1v1Player[];
   casino: ApiCasinoPlayer[];
@@ -75,6 +78,30 @@ export function ClassementTabs({
       {active === "ranked" && (
         <ul className="flex flex-col gap-0.5">
           {ranked.map((p) => (
+            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+              <Rank rank={p.rank} />
+              <Avatar name={p.name} color={p.color} />
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                {p.name}
+                {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
+              </span>
+              <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
+              <TierIcon tier={p.tier} size={20} />
+              <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {active === "ranked-all-time" && (
+        <ul className="flex flex-col gap-0.5">
+          {rankedAllTime.length === 0 && (
+            <p className="px-3 py-6 text-sm text-muted">
+              Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines
+              heures.
+            </p>
+          )}
+          {rankedAllTime.map((p) => (
             <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
