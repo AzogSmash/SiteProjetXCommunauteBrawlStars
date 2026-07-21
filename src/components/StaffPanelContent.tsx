@@ -1,7 +1,7 @@
-import { Users, UserPlus, ShieldAlert, Flag, TrendingUp } from "lucide-react";
+import { Users, UserPlus, ShieldAlert, VolumeX, Ban, Lock, LockOpen, Radio, Flag, TrendingUp } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
-import { getStaffPanel, getFamilyEvolution, type ApiEvolutionEntry } from "@/lib/api";
+import { getStaffPanel, getFamilyEvolution, type ApiEvolutionEntry, type ApiModerationEntry, type ModerationAction } from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
 
 function groupByClub(players: ApiEvolutionEntry[]) {
@@ -23,13 +23,17 @@ function groupByClub(players: ApiEvolutionEntry[]) {
     .sort((a, b) => b.total - a.total);
 }
 
-function IconChip({ children, tone = "primary" }: { children: React.ReactNode; tone?: "primary" | "amber" | "red" }) {
+type Tone = "primary" | "amber" | "red" | "green";
+
+function IconChip({ children, tone = "primary" }: { children: React.ReactNode; tone?: Tone }) {
   const toneClass =
     tone === "amber"
       ? "bg-amber-500/15 text-amber-600"
       : tone === "red"
         ? "bg-red-500/15 text-red-500"
-        : "bg-gradient-to-br from-primary/25 to-primary-2/10 text-primary-2";
+        : tone === "green"
+          ? "bg-emerald-500/15 text-emerald-600"
+          : "bg-gradient-to-br from-primary/25 to-primary-2/10 text-primary-2";
   return (
     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toneClass}`}>{children}</div>
   );
@@ -43,6 +47,36 @@ function EmptyState({ text }: { text: string }) {
       </div>
       <p className="max-w-xs text-sm text-muted">{text}</p>
     </div>
+  );
+}
+
+const MODERATION_META: Record<ModerationAction, { label: string; icon: React.ComponentType<{ size?: number }>; tone: Tone }> = {
+  warn: { label: "Avertissement", icon: ShieldAlert, tone: "amber" },
+  mute: { label: "Mute", icon: VolumeX, tone: "amber" },
+  ban: { label: "Bannissement", icon: Ban, tone: "red" },
+  silence: { label: "Silence", icon: VolumeX, tone: "red" },
+  punition: { label: "Punition", icon: Lock, tone: "primary" },
+  punition_fin: { label: "Fin de punition", icon: LockOpen, tone: "green" },
+  morse: { label: "Punition morse", icon: Radio, tone: "primary" },
+  morse_fin: { label: "Fin de punition morse", icon: LockOpen, tone: "green" },
+};
+
+function ModerationRow({ entry }: { entry: ApiModerationEntry }) {
+  const meta = MODERATION_META[entry.action];
+  const Icon = meta.icon;
+  return (
+    <li className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm">
+      <IconChip tone={meta.tone}>
+        <Icon size={15} />
+      </IconChip>
+      <span className="min-w-0 flex-1 pt-1">
+        <span className="font-medium text-foreground/90">{meta.label}</span> · {entry.target_name}
+        {entry.reason && <> — {entry.reason}</>}
+        {entry.extra && <span className="text-muted"> ({entry.extra})</span>}
+        <span className="ml-2 text-xs text-muted">par {entry.moderator}</span>
+      </span>
+      <span className="shrink-0 pt-1 text-xs text-muted">{formatDateTime(entry.timestamp)}</span>
+    </li>
   );
 }
 
@@ -66,9 +100,9 @@ export async function StaffPanelContent() {
         />
         <StatItem
           icon={ShieldAlert}
-          label="Avertissements"
-          value={String(panel?.warns.length ?? 0)}
-          sub="RÉCENTS"
+          label="Actions modération"
+          value={String(panel?.moderation_log.length ?? 0)}
+          sub="RÉCENTES"
           numeric
         />
         <StatItem
@@ -80,8 +114,12 @@ export async function StaffPanelContent() {
         />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
-        <Panel title="Progression par clan (saison en cours)" className="lg:col-span-2">
+      {/* flex plutôt que grid : avec des listes de longueurs très différentes
+          (7 clans vs 15 arrivées), une grille étire par défaut la colonne la
+          plus courte à la hauteur de la plus longue, laissant un grand vide
+          à l'intérieur de la carte (retour du 21/07/2026 — "ça fait vide"). */}
+      <div className="mt-6 flex flex-col items-start gap-6 lg:flex-row">
+        <Panel title="Progression par clan (saison en cours)" className="w-full lg:w-2/3">
           {clubRows.length === 0 ? (
             <EmptyState text="Pas encore de données de saison." />
           ) : (
@@ -109,7 +147,7 @@ export async function StaffPanelContent() {
           )}
         </Panel>
 
-        <Panel title="Arrivées récentes">
+        <Panel title="Arrivées récentes" className="w-full lg:w-1/3">
           {!panel || panel.recent_members.length === 0 ? (
             <EmptyState text="Aucune donnée disponible." />
           ) : (
@@ -130,27 +168,17 @@ export async function StaffPanelContent() {
 
       <div className="mt-6">
         <Panel title="Journal de modération">
-          {!panel || (panel.warns.length === 0 && panel.reports.length === 0) ? (
-            <EmptyState text="Aucun avertissement ni signalement récent." />
+          {!panel || (panel.moderation_log.length === 0 && panel.reports.length === 0) ? (
+            <EmptyState text="Aucune action de modération ni signalement récent." />
           ) : (
             <ul className="flex flex-col gap-1">
-              {panel.warns.map((w, i) => (
-                <li key={`warn-${i}`} className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm">
-                  <IconChip tone="amber">
-                    <ShieldAlert size={15} />
-                  </IconChip>
-                  <span className="min-w-0 flex-1 pt-1">
-                    <span className="font-medium text-foreground/90">Avertissement</span> · membre{" "}
-                    <span className="text-muted">{w.user_id}</span> — {w.reason}
-                    <span className="ml-2 text-xs text-muted">par {w.moderator}</span>
-                  </span>
-                  <span className="shrink-0 pt-1 text-xs text-muted">{formatDateTime(w.timestamp)}</span>
-                </li>
+              {panel.moderation_log.map((entry, i) => (
+                <ModerationRow key={`mod-${i}`} entry={entry} />
               ))}
               {panel.reports.map((r, i) => (
                 <li key={`report-${i}`} className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm">
                   <IconChip tone="red">
-                    <ShieldAlert size={15} />
+                    <Flag size={15} />
                   </IconChip>
                   <span className="min-w-0 flex-1 pt-1">
                     <span className="font-medium text-foreground/90">Signalement ranked</span> · cible{" "}

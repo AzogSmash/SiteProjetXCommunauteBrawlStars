@@ -135,11 +135,24 @@ export function getDiscordMember(discordId: string) {
   return getJson<ApiDiscordMember>(`/api/member/${encodeURIComponent(discordId)}`, internalHeaders());
 }
 
-// Panel staff (voir lib/access.ts) — arrivées récentes, avertissements,
-// signalements. Même protection par secret partagé que getDiscordMember.
+// Panel staff (voir lib/access.ts) — arrivées récentes, journal d'audit de
+// modération, signalements. Même protection par secret partagé que
+// getDiscordMember.
+export type ModerationAction = "warn" | "mute" | "ban" | "silence" | "punition" | "punition_fin" | "morse" | "morse_fin";
+
+export type ApiModerationEntry = {
+  action: ModerationAction;
+  target_id: string;
+  target_name: string;
+  moderator: string;
+  reason: string | null;
+  extra: string | null;
+  timestamp: string;
+};
+
 export type ApiStaffPanel = {
   recent_members: { name: string; joined_at: string }[];
-  warns: { user_id: string; reason: string; moderator: string; timestamp: string }[];
+  moderation_log: ApiModerationEntry[];
   reports: { target: string; reporter: string; reason: string; created_at: string; resolved: boolean }[];
 };
 
