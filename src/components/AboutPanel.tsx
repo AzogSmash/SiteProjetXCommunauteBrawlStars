@@ -2,7 +2,7 @@ import { communityDescription, discordInviteUrl } from "@/lib/data";
 
 export function AboutPanel() {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
+    <div className="card-elevated rounded-2xl border border-border bg-surface p-5">
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-foreground">
         À propos
       </h2>

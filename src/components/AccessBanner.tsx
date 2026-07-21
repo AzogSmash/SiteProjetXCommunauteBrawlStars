@@ -12,7 +12,7 @@ import { discordInviteUrl } from "@/lib/data";
 export function AccessBanner({ access, clubs }: { access: AccessContext; clubs: FamilyClub[] }) {
   if (access.tier === "invite") {
     return (
-      <div className="mx-auto mb-6 flex max-w-7xl flex-col items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-primary-2/10 p-5 px-6 sm:flex-row">
+      <div className="card-elevated mx-auto mb-6 flex max-w-7xl flex-col items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-primary-2/10 p-5 px-6 sm:flex-row">
         <div>
           <p className="font-display text-lg font-bold uppercase tracking-wide text-foreground">
             {access.loggedIn && !access.inGuild
@@ -48,7 +48,7 @@ export function AccessBanner({ access, clubs }: { access: AccessContext; clubs: 
   const panelLabel = access.tier === "admin" ? "Panel admin" : "Panel staff";
 
   return (
-    <div className="mx-auto mb-6 flex max-w-7xl flex-col items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-5 px-6 sm:flex-row">
+    <div className="card-elevated mx-auto mb-6 flex max-w-7xl flex-col items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-5 px-6 sm:flex-row">
       <div>
         <p className="font-display text-lg font-bold uppercase tracking-wide text-foreground">
           {club ? `Bienvenue dans ${club.name}` : "Bienvenue"}

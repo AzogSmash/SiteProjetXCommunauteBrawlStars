@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Shield, Clock, ChevronRight } from "lucide-react";
 import { LogoMark } from "./Logo";
 import { Avatar } from "./Avatar";
@@ -17,14 +18,14 @@ export function HeroHighlights({
   seasonTimeLeft: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
+    <div className="card-elevated rounded-2xl border border-border bg-surface p-5">
       <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-muted">
         Aperçu de la famille
       </p>
 
-      <a
+      <Link
         href="/clubs"
-        className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 p-3 transition-colors hover:border-primary/60"
+        className="card-elevated-hover flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 p-3 hover:border-primary/60"
       >
         <LogoMark size={38} />
         <div className="min-w-0 flex-1">
@@ -36,7 +37,7 @@ export function HeroHighlights({
           {flagship.trophies}
         </div>
         <ChevronRight size={16} className="text-muted" />
-      </a>
+      </Link>
 
       <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-surface-2 p-3">
         <Avatar name={bestPlayer.name} color={bestPlayer.color} />

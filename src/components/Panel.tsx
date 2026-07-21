@@ -12,7 +12,7 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl border border-border bg-surface p-5 ${className}`}>
+    <div className={`card-elevated rounded-2xl border border-border bg-surface p-5 ${className}`}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">
           {title}

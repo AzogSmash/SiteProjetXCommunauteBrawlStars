@@ -27,7 +27,7 @@ export default async function PusheursPage() {
       />
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
-        <div className="rounded-2xl border border-primary/40 bg-primary/10 p-6">
+        <div className="card-elevated rounded-2xl border border-primary/40 bg-primary/10 p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-primary-2">

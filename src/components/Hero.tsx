@@ -16,11 +16,14 @@ export function Hero({
   seasonTimeLeft: string;
 }) {
   return (
-    <section className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 py-14 lg:grid-cols-2 lg:py-16">
+    <section className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 overflow-hidden px-6 py-14 lg:grid-cols-2 lg:py-16">
+      <div className="glow-spot -left-24 -top-32 h-80 w-80 bg-primary/25" />
+      <div className="glow-spot -right-32 top-10 h-96 w-96 bg-primary-2/20" />
+
       <BrandCorner className="absolute left-2 top-2 hidden sm:block" />
       <BrandCorner className="absolute right-2 top-2 hidden rotate-90 sm:block" />
 
-      <div>
+      <div className="relative z-10">
         <div className="mb-3 flex items-center gap-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-2">
             Bienvenue sur
@@ -58,12 +61,14 @@ export function Hero({
         </div>
       </div>
 
-      <HeroHighlights
-        flagship={flagship}
-        bestPlayer={bestPlayer}
-        currentSeason={currentSeason}
-        seasonTimeLeft={seasonTimeLeft}
-      />
+      <div className="relative z-10">
+        <HeroHighlights
+          flagship={flagship}
+          bestPlayer={bestPlayer}
+          currentSeason={currentSeason}
+          seasonTimeLeft={seasonTimeLeft}
+        />
+      </div>
     </section>
   );
 }

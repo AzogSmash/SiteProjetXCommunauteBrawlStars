@@ -24,8 +24,8 @@ export default async function ClubsPage() {
               href={`/clubs/${club.slug}`}
               className={
                 club.isFlagship
-                  ? "group flex flex-col gap-3 rounded-2xl border border-primary/40 bg-primary/10 p-4 transition-colors hover:border-primary/70"
-                  : "group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-primary/40"
+                  ? "card-elevated card-elevated-hover group flex flex-col gap-3 rounded-2xl border border-primary/40 bg-primary/10 p-4 hover:border-primary/70"
+                  : "card-elevated card-elevated-hover group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 hover:border-primary/40"
               }
             >
               <div className="flex items-center justify-between gap-2">

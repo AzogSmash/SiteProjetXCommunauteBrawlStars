@@ -16,7 +16,7 @@ export function StatItem({
   numeric?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 px-6 py-5">
+    <div className="card-elevated card-elevated-hover flex items-center gap-4 rounded-2xl border border-border bg-surface px-5 py-5">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/25 to-primary-2/10 text-primary-2">
         {iconNode ?? <Icon size={22} />}
       </div>

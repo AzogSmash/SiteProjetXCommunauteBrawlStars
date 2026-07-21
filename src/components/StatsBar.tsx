@@ -62,7 +62,11 @@ export function StatsBar({
 
   return (
     <section className="mx-auto max-w-7xl px-6">
-      <div className="grid grid-cols-1 divide-y divide-border rounded-2xl border border-border bg-surface sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5">
+      {/* Cartes individuelles plutôt qu'une barre divisée : avec 5 items, le
+          découpage sm:grid-cols-2 laissait le dernier tout seul sur sa
+          ligne, mal aligné avec les traits de séparation (voir retour du
+          21/07/2026 — "cases pas alignées"). */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {items.map((item) => (
           <StatItem key={item.label} {...item} />
         ))}

@@ -29,7 +29,7 @@ export default async function ClubDetailPage({
       />
 
       <section className="mx-auto max-w-7xl px-6">
-        <div className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 sm:flex-row sm:items-center">
+        <div className="card-elevated flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 sm:flex-row sm:items-center">
           <div className="relative flex h-32 w-32 shrink-0 items-center justify-center rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(113,54,186,0.18)] sm:h-40 sm:w-40">
             {club.isFlagship ? (
               <Image src="/logo-x-square.png" alt={`Emblème ${club.name}`} fill sizes="160px" className="object-contain p-4" />
@@ -67,7 +67,7 @@ export default async function ClubDetailPage({
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-6">
-        <div className="grid grid-cols-1 divide-y divide-border rounded-2xl border border-border bg-surface sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatItem icon={Users} iconNode={<TrophyIcon size={26} />} label="Trophées totaux" value={club.trophies} sub="CLUB" numeric />
           <StatItem icon={Users} label="Membres" value={String(club.memberCount)} sub="ACTIFS" numeric />
           <StatItem icon={Users} iconNode={<LockIcon size={24} />} label="Trophées requis" value={club.requiredTrophies || "—"} sub="MINIMUM" numeric />
