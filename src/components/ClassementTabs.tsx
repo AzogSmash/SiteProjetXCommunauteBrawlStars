@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Crown, Coins, Swords, Zap } from "lucide-react";
+import Image from "next/image";
+import { Crown, Swords } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
@@ -129,7 +130,7 @@ export function ClassementTabs({
               </span>
               {p.elo !== undefined && (
                 <span className="hidden items-center gap-1 text-sm font-semibold text-foreground/90 sm:flex">
-                  <Zap size={12} className="text-primary-2" />
+                  <Image src="/icons/ranked.png" alt="" width={16} height={16} />
                   {p.elo}
                 </span>
               )}
@@ -174,7 +175,7 @@ export function ClassementTabs({
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
               <span className="flex items-center gap-1 text-sm font-semibold text-amber-600">
-                <Coins size={14} />
+                <Image src="/icons/coins.png" alt="" width={16} height={16} />
                 {formatNumber(p.coins)}
               </span>
             </li>

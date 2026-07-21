@@ -1,4 +1,4 @@
-import { TrendingUp } from "lucide-react";
+import Image from "next/image";
 import type { Player } from "@/lib/family";
 import { Panel } from "./Panel";
 import { Avatar } from "./Avatar";
@@ -21,7 +21,7 @@ export function TopPushers({ pushers }: { pushers: Player[] }) {
             <span className="text-sm font-semibold text-foreground/90">
               {player.trophies}
             </span>
-            <TrendingUp size={14} className="text-primary-2" />
+            <Image src="/icons/ranked.png" alt="" width={16} height={16} />
           </li>
         ))}
       </ul>
