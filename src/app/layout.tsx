@@ -39,12 +39,18 @@ export default function RootLayout({
       lang="fr"
       className={`${geistSans.variable} ${syncopate.variable} ${lilitaOne.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <div className="bg-grid flex flex-1 flex-col">
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </div>
+      <body className="bg-grid min-h-full bg-background text-foreground">
+        {/* Le footer suivait avant un bloc forcé à flex-1 (stretch jusqu'en
+            bas du viewport) : sur les pages courtes (ex: /clubs), ça
+            laissait un grand vide entre le contenu réel et le footer (retour
+            du 21/07/2026 — "ça fait vide"). Flux normal maintenant : le
+            footer suit directement le contenu, comme sur n'importe quel
+            site. bg-grid posé sur <body> plutôt que sur ce div pour que le
+            motif couvre aussi l'espace sous le footer si jamais le contenu
+            est plus court que le viewport. */}
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );
