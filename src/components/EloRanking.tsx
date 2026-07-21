@@ -15,8 +15,8 @@ export function EloRanking({ players }: { players: RankedPlayer[] }) {
   return (
     <Panel
       title="Classement des meilleurs élo"
-      linkLabel="Voir plus"
-      linkHref="/ranked"
+      linkLabel="Voir tous les classements"
+      linkHref="/classement"
     >
       <ul className="flex flex-col gap-0.5">
         {players.map((player) => (

@@ -1,9 +1,8 @@
 export const navLinks = [
   { label: "Accueil", href: "/" },
   { label: "Clubs", href: "/clubs" },
-  { label: "Joueurs", href: "/joueurs" },
-  { label: "Saisons", href: "/saisons" },
-  { label: "Ranked", href: "/ranked" },
+  { label: "Classement", href: "/classement" },
+  { label: "Pusheurs", href: "/pusheurs" },
   { label: "Actualités", href: "/actualites" },
 ];
 

@@ -106,6 +106,18 @@ export function getFamilySeasonArchive(month: string) {
   return getJson<ApiSeasonArchive>(`/api/famille/evolution/${encodeURIComponent(month)}`);
 }
 
+export type Api1v1Player = { name: string; points: number; wins: number; losses: number; tier: string };
+
+export function getFamilyClassement1v1() {
+  return getJson<Api1v1Player[]>("/api/famille/classement_1v1");
+}
+
+export type ApiCasinoPlayer = { name: string; coins: number };
+
+export function getFamilyClassementCasino() {
+  return getJson<ApiCasinoPlayer[]>("/api/famille/classement_casino");
+}
+
 // Miroir des rôles Discord (voir supabase/003_discord_members.sql côté bot)
 // — pilote les niveaux d'accès du site, voir lib/access.ts. `null` veut dire
 // soit l'API est injoignable, soit cet ID n'est pas (plus) membre du serveur

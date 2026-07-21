@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ChevronsRight, BarChart3 } from "lucide-react";
 import { HeroHighlights } from "./HeroHighlights";
 import { BrandCorner } from "./BrandCorner";
@@ -40,20 +41,20 @@ export function Hero({
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <a
+          <Link
             href="/clubs"
             className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-2 px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(113,54,186,0.35)] transition-transform hover:scale-[1.03]"
           >
             <ChevronsRight size={18} />
             Découvrir les clubs
-          </a>
-          <a
-            href="/ranked"
+          </Link>
+          <Link
+            href="/classement"
             className="flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/60"
           >
             <BarChart3 size={18} />
             Voir le classement
-          </a>
+          </Link>
         </div>
       </div>
 

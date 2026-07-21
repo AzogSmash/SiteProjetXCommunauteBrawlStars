@@ -8,7 +8,7 @@ export function TopPushers({ pushers }: { pushers: Player[] }) {
     <Panel
       title="Meilleurs pushers (saison en cours)"
       linkLabel="Voir plus"
-      linkHref="/saisons"
+      linkHref="/pusheurs"
     >
       <ul className="flex flex-col gap-1">
         {pushers.map((player) => (

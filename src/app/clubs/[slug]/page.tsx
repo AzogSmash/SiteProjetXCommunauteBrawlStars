@@ -76,7 +76,7 @@ export default async function ClubDetailPage({
       </section>
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
-        <Panel title="Effectif du club" linkLabel="Voir les joueurs" linkHref="/joueurs">
+        <Panel title="Effectif du club" linkLabel="Voir le classement" linkHref="/classement?tab=trophees">
           {club.roster.length === 0 ? (
             <p className="px-3 py-6 text-sm text-muted">
               L&apos;effectif de ce club n&apos;est pas encore synchronisé — réessaie un peu plus
