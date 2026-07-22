@@ -88,6 +88,14 @@ export function getFamilyClans() {
   return getJson<ApiClan[]>("/api/famille/clans");
 }
 
+// Signal global "le bot répond" pour la bannière de données de démo (voir
+// DemoDataBanner) — même endpoint et même cache que getFamilyClans, pas
+// d'appel réseau supplémentaire pour les pages qui l'appellent déjà.
+export async function isBotReachable(): Promise<boolean> {
+  const clans = await getFamilyClans();
+  return !!clans && clans.length > 0;
+}
+
 export function getFamilyTrophees() {
   return getJson<ApiTrophyEntry[]>("/api/famille/trophees");
 }

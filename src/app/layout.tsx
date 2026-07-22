@@ -3,7 +3,9 @@ import { Geist, Syncopate, Lilita_One } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BsLinkModal } from "@/components/BsLinkModal";
+import { DemoDataBanner } from "@/components/DemoDataBanner";
 import { getAccessContext } from "@/lib/access";
+import { isBotReachable } from "@/lib/api";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,7 +38,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const access = await getAccessContext();
+  const [access, botReachable] = await Promise.all([getAccessContext(), isBotReachable()]);
   const shouldShowBsLinkPrompt = access.loggedIn && access.inGuild && !access.bsLinked;
 
   return (
@@ -53,6 +55,7 @@ export default async function RootLayout({
             site. bg-grid posé sur <body> plutôt que sur ce div pour que le
             motif couvre aussi l'espace sous le footer si jamais le contenu
             est plus court que le viewport. */}
+        {!botReachable && <DemoDataBanner />}
         <Navbar />
         {children}
         <Footer />
