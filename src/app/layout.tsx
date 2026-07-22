@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Syncopate, Lilita_One } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BsLinkModal } from "@/components/BsLinkModal";
+import { getAccessContext } from "@/lib/access";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,11 +31,14 @@ export const metadata: Metadata = {
     "Regroupe, analyse et compare les performances de notre communauté de clubs Brawl Stars.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const access = await getAccessContext();
+  const shouldShowBsLinkPrompt = access.loggedIn && access.inGuild && !access.bsLinked;
+
   return (
     <html
       lang="fr"
@@ -51,6 +56,7 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Footer />
+        <BsLinkModal shouldShow={shouldShowBsLinkPrompt} />
       </body>
     </html>
   );

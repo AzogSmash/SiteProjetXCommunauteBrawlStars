@@ -13,6 +13,7 @@ export type AccessContext = {
   inGuild: boolean;
   tier: AccessTier;
   clubSlug: string | null;
+  bsLinked: boolean;
 };
 
 const GUEST_ROLE_ID = "1513110804583547047";
@@ -31,7 +32,7 @@ const CLUB_ROLE_SLUGS: Record<string, string> = {
   "1528835091718213743": "projet", // Projet Ψ
 };
 
-const ANONYMOUS: AccessContext = { loggedIn: false, inGuild: false, tier: "invite", clubSlug: null };
+const ANONYMOUS: AccessContext = { loggedIn: false, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false };
 
 // Server-only : lit la session Supabase (cookies) puis résout le rôle Discord
 // réel depuis le miroir tenu par le bot (jamais via un scope OAuth guilds —
@@ -48,7 +49,7 @@ export async function getAccessContext(): Promise<AccessContext> {
   if (!discordId) return { ...ANONYMOUS, loggedIn: true };
 
   const member = await getDiscordMember(discordId);
-  if (!member) return { loggedIn: true, inGuild: false, tier: "invite", clubSlug: null };
+  if (!member) return { loggedIn: true, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false };
 
   const clubSlug =
     Object.entries(CLUB_ROLE_SLUGS).find(([roleId]) => member.role_ids.includes(roleId))?.[1] ?? null;
@@ -62,5 +63,5 @@ export async function getAccessContext(): Promise<AccessContext> {
     tier = "membre";
   }
 
-  return { loggedIn: true, inGuild: true, tier, clubSlug };
+  return { loggedIn: true, inGuild: true, tier, clubSlug, bsLinked: member.bs_linked };
 }
