@@ -7,7 +7,9 @@ function NewsIconGraphic({ icon }: { icon: NewsIcon }) {
   if (icon === "skull") {
     // Vraie icône de palier "Pro" du jeu — utilisée pour les actus de victoire
     // en ranked, plus parlante que l'ancienne icône générique.
-    return <Image src="/ranked-tiers/pro.png" alt="" width={24} height={24} />;
+    return (
+      <Image src="/ranked-tiers/pro.png" alt="" width={24} height={24} style={{ width: 24, height: 24 }} />
+    );
   }
   const Icon = { shield: Shield, message: MessageCircle, trophy: Trophy }[icon];
   return <Icon size={18} />;

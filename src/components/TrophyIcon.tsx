@@ -7,6 +7,7 @@ export function TrophyIcon({ size = 14, className = "" }: { size?: number; class
       alt="Trophées"
       width={size}
       height={size}
+      style={{ width: size, height: size }}
       className={`inline-block shrink-0 ${className}`}
     />
   );

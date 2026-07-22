@@ -109,7 +109,13 @@ export default async function PusheursPage() {
 
           {!history ? (
             <div className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-5">
-              <Image src="/icons/world-adventureland.png" alt="" width={40} height={40} />
+              <Image
+                src="/icons/world-adventureland.png"
+                alt=""
+                width={40}
+                height={40}
+                style={{ width: 40, height: 40 }}
+              />
               <p className="text-sm text-muted">
                 Aucune saison archivée pour l&apos;instant — la première sera enregistrée à la fin
                 de la saison en cours.

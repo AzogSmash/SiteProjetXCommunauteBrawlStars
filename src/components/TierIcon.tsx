@@ -8,6 +8,7 @@ export function TierIcon({ tier, size = 16 }: { tier: string; size?: number }) {
       alt={tier}
       width={size}
       height={size}
+      style={{ width: size, height: size }}
       className="shrink-0"
     />
   );

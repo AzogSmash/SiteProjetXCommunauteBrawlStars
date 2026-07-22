@@ -211,7 +211,7 @@ export function ClassementTabs({
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
               <span className="flex items-center gap-1 text-sm font-semibold text-amber-600">
-                <Image src="/icons/coins.png" alt="" width={16} height={16} />
+                <Image src="/icons/coins.png" alt="" width={16} height={16} style={{ width: 16, height: 16 }} />
                 {formatNumber(p.coins)}
               </span>
             </li>
