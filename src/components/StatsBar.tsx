@@ -2,61 +2,54 @@ import { Users, TrendingUp, Shield } from "lucide-react";
 import { StatItem } from "./StatItem";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
+import type { CommunityStats } from "@/lib/family";
+
+const NOT_SYNCED = "Pas encore synchronisé";
 
 export function StatsBar({
-  totalTrophies,
-  activePlayers,
-  bestElo,
-  bestEloTier,
-  clubCount,
-  topPusher,
+  stats,
   currentSeason,
   seasonTimeLeft,
 }: {
-  totalTrophies: string;
-  activePlayers: number;
-  bestElo: number;
-  bestEloTier: string;
-  clubCount: number;
-  topPusher: { name: string; trophies: string };
-  currentSeason: string;
-  seasonTimeLeft: string;
+  stats: CommunityStats | null;
+  currentSeason: string | null;
+  seasonTimeLeft: string | null;
 }) {
   const items = [
     {
       icon: Users,
       iconNode: <TrophyIcon size={26} />,
       label: "Trophées totaux",
-      value: totalTrophies,
-      sub: `${clubCount} CLUBS`,
+      value: stats ? stats.totalTrophies : "—",
+      sub: stats ? `${stats.clubCount} CLUBS` : NOT_SYNCED,
       numeric: true,
     },
     {
       icon: Users,
       label: "Nombre de joueurs",
-      value: String(activePlayers),
+      value: stats ? String(stats.activePlayers) : "—",
       sub: "ACTIFS",
       numeric: true,
     },
     {
       icon: Users,
-      iconNode: <TierIcon tier={bestEloTier} size={26} />,
+      iconNode: stats?.bestEloTier ? <TierIcon tier={stats.bestEloTier} size={26} /> : undefined,
       label: "Meilleur élo ranked",
-      value: String(bestElo),
-      sub: bestEloTier,
+      value: stats?.bestElo != null ? String(stats.bestElo) : "—",
+      sub: stats?.bestEloTier ?? NOT_SYNCED,
       numeric: true,
     },
     {
       icon: TrendingUp,
       label: "Meilleur pusher",
-      value: topPusher.name,
-      sub: `${topPusher.trophies} 🏆`,
+      value: stats?.topPusher?.name ?? "—",
+      sub: stats?.topPusher ? `${stats.topPusher.trophies} 🏆` : NOT_SYNCED,
     },
     {
       icon: Shield,
       label: "Saison en cours",
-      value: currentSeason,
-      sub: seasonTimeLeft,
+      value: currentSeason ?? "—",
+      sub: seasonTimeLeft ?? NOT_SYNCED,
     },
   ];
 

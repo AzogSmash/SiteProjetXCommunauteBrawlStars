@@ -10,10 +10,10 @@ export function Hero({
   currentSeason,
   seasonTimeLeft,
 }: {
-  flagship: FamilyClub;
-  bestPlayer: RankedPlayer;
-  currentSeason: string;
-  seasonTimeLeft: string;
+  flagship?: FamilyClub;
+  bestPlayer?: RankedPlayer;
+  currentSeason?: string;
+  seasonTimeLeft?: string;
 }) {
   return (
     <section className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 overflow-hidden px-6 py-14 lg:grid-cols-2 lg:py-16">

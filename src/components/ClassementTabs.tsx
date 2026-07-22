@@ -12,6 +12,7 @@ import { colorFromSeed, formatNumber } from "@/lib/format";
 import { formatSeasonEndLabel, type SeasonCategory } from "@/lib/seasonReset";
 import type { RankedPlayer, Player } from "@/lib/family";
 import type { Api1v1Player, ApiCasinoPlayer } from "@/lib/api";
+import { DataUnavailable } from "./DataUnavailable";
 
 const TABS = [
   { id: "ranked", label: "Ranked" },
@@ -114,6 +115,7 @@ export function ClassementTabs({
 
       {active === "ranked" && (
         <ul className="flex flex-col gap-0.5">
+          {ranked.length === 0 && <DataUnavailable message="Classement ranked pas encore synchronisé." />}
           {ranked.map((p) => (
             <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={p.rank} />
@@ -133,10 +135,7 @@ export function ClassementTabs({
       {active === "ranked-all-time" && (
         <ul className="flex flex-col gap-0.5">
           {rankedAllTime.length === 0 && (
-            <p className="px-3 py-6 text-sm text-muted">
-              Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines
-              heures.
-            </p>
+            <DataUnavailable message="Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines heures." />
           )}
           {rankedAllTime.map((p) => (
             <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
@@ -156,6 +155,7 @@ export function ClassementTabs({
 
       {active === "trophees" && (
         <ul className="flex flex-col gap-0.5">
+          {trophees.length === 0 && <DataUnavailable message="Classement des trophées pas encore synchronisé." />}
           {trophees.map((p) => (
             <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={p.rank} />
@@ -175,9 +175,7 @@ export function ClassementTabs({
 
       {active === "1v1" && (
         <ul className="flex flex-col gap-0.5">
-          {duel1v1.length === 0 && (
-            <p className="px-3 py-6 text-sm text-muted">Aucun duel joué pour l&apos;instant.</p>
-          )}
+          {duel1v1.length === 0 && <DataUnavailable message="Aucun duel joué pour l'instant." />}
           {duel1v1.map((p, i) => (
             <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />
@@ -202,9 +200,7 @@ export function ClassementTabs({
 
       {active === "casino" && (
         <ul className="flex flex-col gap-0.5">
-          {casino.length === 0 && (
-            <p className="px-3 py-6 text-sm text-muted">Personne n&apos;a encore de jetons.</p>
-          )}
+          {casino.length === 0 && <DataUnavailable message="Personne n'a encore de jetons." />}
           {casino.map((p, i) => (
             <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />

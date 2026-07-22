@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { Avatar } from "@/components/Avatar";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { DataUnavailable } from "@/components/DataUnavailable";
 import {
   getCurrentSeasonProgress,
   getSeasonHistory,
@@ -35,33 +36,41 @@ export default async function PusheursPage() {
                 Saison en cours
               </p>
               <h2 className="font-display text-2xl font-extrabold uppercase tracking-wide">
-                {season.label}
+                {season?.label ?? "—"}
               </h2>
             </div>
-            <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground">
-              <Clock size={16} className="text-primary-2" />
-              {season.timeLeft}
-            </div>
+            {season && (
+              <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground">
+                <Clock size={16} className="text-primary-2" />
+                {season.timeLeft}
+              </div>
+            )}
           </div>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
-              <TrophyIcon size={24} />
-              <div>
-                <p className="text-xs text-muted">Trophées gagnés par la famille</p>
-                <p className="text-sm font-bold text-foreground">{current.topClubTrophies}</p>
+          {current ? (
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
+                <TrophyIcon size={24} />
+                <div>
+                  <p className="text-xs text-muted">Trophées gagnés par la famille</p>
+                  <p className="text-sm font-bold text-foreground">{current.topClubTrophies}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
+                <Crown size={18} className="text-primary-2" />
+                <div>
+                  <p className="text-xs text-muted">Roi du push</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {current.topPlayer} <span className="text-primary-2">{current.topPlayerDelta}</span>
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
-              <Crown size={18} className="text-primary-2" />
-              <div>
-                <p className="text-xs text-muted">Roi du push</p>
-                <p className="text-sm font-bold text-foreground">
-                  {current.topPlayer} <span className="text-primary-2">{current.topPlayerDelta}</span>
-                </p>
-              </div>
+          ) : (
+            <div className="mt-5">
+              <DataUnavailable message="Progression de la saison pas encore synchronisée." />
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-5">
@@ -82,6 +91,9 @@ export default async function PusheursPage() {
             linkHref="/classement"
           >
             <ul className="flex flex-col gap-0.5">
+              {pushers.length === 0 && (
+                <DataUnavailable message="Pas encore de progression enregistrée cette saison." />
+              )}
               {pushers.map((player) => (
                 <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                   <span className="w-6 text-sm font-bold text-muted">{player.rank}</span>

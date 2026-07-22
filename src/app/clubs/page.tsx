@@ -3,6 +3,7 @@ import { Users, Shield, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { LogoMark } from "@/components/Logo";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { DataUnavailable } from "@/components/DataUnavailable";
 import { getFamilyClubs } from "@/lib/family";
 
 export default async function ClubsPage() {
@@ -17,6 +18,11 @@ export default async function ClubsPage() {
       />
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
+        {clubs.length === 0 && (
+          <div className="card-elevated rounded-2xl border border-border bg-surface">
+            <DataUnavailable message="Aucun club synchronisé pour l'instant." />
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {clubs.map((club) => (
             <Link

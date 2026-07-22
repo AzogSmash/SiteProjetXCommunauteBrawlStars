@@ -34,19 +34,14 @@ export default async function Home() {
       <Hero
         flagship={flagship}
         bestPlayer={bestPlayer}
-        currentSeason={season.label}
-        seasonTimeLeft={season.timeLeft}
+        currentSeason={season?.label}
+        seasonTimeLeft={season?.timeLeft}
       />
       <AccessBanner access={access} clubs={clubs} />
       <StatsBar
-        totalTrophies={stats.totalTrophies}
-        activePlayers={stats.activePlayers}
-        bestElo={stats.bestElo}
-        bestEloTier={stats.bestEloTier}
-        clubCount={stats.clubCount}
-        topPusher={stats.topPusher}
-        currentSeason={season.label}
-        seasonTimeLeft={season.timeLeft}
+        stats={stats}
+        currentSeason={season?.label ?? null}
+        seasonTimeLeft={season?.timeLeft ?? null}
       />
       <FounderStory />
 

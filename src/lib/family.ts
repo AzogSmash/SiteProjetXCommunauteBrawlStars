@@ -9,17 +9,6 @@ import {
   type ApiClubRole,
 } from "./api";
 import { formatNumber, spaceClubName, colorFromSeed } from "./format";
-import {
-  familyClubs as demoFamilyClubs,
-  allPlayers as demoAllPlayers,
-  topPushers as demoTopPushers,
-  eloRanking as demoEloRanking,
-  fullEloRanking as demoFullEloRanking,
-  heroStats as demoHeroStats,
-  flagshipClub as demoFlagshipClub,
-  clubRoster as demoClubRoster,
-  seasons as demoSeasons,
-} from "./data";
 
 export type FamilyClub = {
   rank: number;
@@ -32,8 +21,6 @@ export type FamilyClub = {
   color?: string;
 };
 
-// tag/club absents quand on retombe sur les données de démo (pas de vrai
-// tag Brawl Stars pour un joueur fictif).
 export type Player = {
   rank: number;
   tag?: string;
@@ -89,16 +76,14 @@ async function buildFamilyClubs(): Promise<FamilyClub[] | null> {
 }
 
 export async function getFamilyClubs(): Promise<FamilyClub[]> {
-  const real = await buildFamilyClubs();
-  if (real) return real;
-  return demoFamilyClubs.map((c) => ({ ...c, tag: `#${c.tag}`, isFlagship: !!c.isFlagship }));
+  return (await buildFamilyClubs()) ?? [];
 }
 
 export async function getPlayersLeaderboard(): Promise<Player[]> {
   // Le cache ranked se rafraîchit toutes les 4h côté bot — largement
   // suffisant ici, pas besoin de le solliciter plus souvent.
   const [trophees, ranked] = await Promise.all([getFamilyTrophees(), getFamilyRanked()]);
-  if (!trophees || trophees.length === 0) return demoAllPlayers;
+  if (!trophees || trophees.length === 0) return [];
 
   const eloByTag = new Map<string, number>();
   if (ranked) {
@@ -128,9 +113,7 @@ export async function getPlayersLeaderboard(): Promise<Player[]> {
 // de !evo, qui affiche le podium + la liste paginée de tous les membres).
 export async function getSeasonTopPushers(limit?: number): Promise<Player[]> {
   const evolution = await getFamilyEvolution();
-  if (!evolution || evolution.players.length === 0) {
-    return limit ? demoTopPushers.slice(0, limit) : demoTopPushers;
-  }
+  if (!evolution || evolution.players.length === 0) return [];
 
   const sorted = evolution.players.slice().sort((a, b) => b.delta - a.delta);
   const sliced = limit ? sorted.slice(0, limit) : sorted;
@@ -164,8 +147,7 @@ async function buildRankedLeaderboard(): Promise<RankedPlayer[] | null> {
 }
 
 export async function getRankedLeaderboard(limit?: number): Promise<RankedPlayer[]> {
-  const real = await buildRankedLeaderboard();
-  const source: RankedPlayer[] = real ?? demoFullEloRanking;
+  const source = (await buildRankedLeaderboard()) ?? [];
   return limit ? source.slice(0, limit) : source;
 }
 
@@ -181,7 +163,14 @@ async function buildAllTimeRankedLeaderboard(): Promise<RankedPlayer[] | null> {
 
   return withPeak
     .map(([tag, p]) => ({ tag, ...p }))
-    .sort((a, b) => (b.highest_ranked_pts ?? 0) - (a.highest_ranked_pts ?? 0))
+    // Trié par index de palier officiel d'abord (fiable même quand le score
+    // brut n'est pas comparable — record fait sous l'ancien système Ranked,
+    // voir highest_ranked_rank sur ApiRankedPlayer), score en départage.
+    .sort((a, b) => {
+      const rankDiff = (b.highest_ranked_rank ?? -1) - (a.highest_ranked_rank ?? -1);
+      if (rankDiff !== 0) return rankDiff;
+      return (b.highest_ranked_pts ?? 0) - (a.highest_ranked_pts ?? 0);
+    })
     .map((p, i) => ({
       rank: i + 1,
       tag: p.tag,
@@ -197,15 +186,24 @@ export async function getAllTimeRankedLeaderboard(): Promise<RankedPlayer[]> {
   return (await buildAllTimeRankedLeaderboard()) ?? [];
 }
 
-export async function getHomeRankedPreview() {
+export async function getHomeRankedPreview(): Promise<RankedPlayer[]> {
   const real = await buildRankedLeaderboard();
-  if (real) return real.slice(0, 5);
-  return demoEloRanking;
+  return real ? real.slice(0, 5) : [];
 }
 
-// Le numéro/compte à rebours de saison n'a pas d'équivalent fiable côté API,
-// reste en démo même quand le reste est branché.
-export async function getCommunityStats() {
+export type CommunityStats = {
+  totalTrophies: string;
+  activePlayers: number;
+  bestElo: number | null;
+  bestEloTier: string | null;
+  clubCount: number;
+  topPusher: { name: string; trophies: string } | null;
+};
+
+// null si le bot n'a pas encore synchronisé clans/trophées — chaque champ
+// individuel (élo, pusher) reste nullable même quand le reste est
+// disponible, ce cache-là pouvant se remplir séparément des autres.
+export async function getCommunityStats(): Promise<CommunityStats | null> {
   const [clans, trophees, ranked, evolution] = await Promise.all([
     getFamilyClans(),
     getFamilyTrophees(),
@@ -213,20 +211,12 @@ export async function getCommunityStats() {
     getFamilyEvolution(),
   ]);
 
-  if (!clans || clans.length === 0 || !trophees) {
-    return {
-      totalTrophies: demoHeroStats.totalTrophies,
-      activePlayers: demoHeroStats.activePlayers,
-      bestElo: demoHeroStats.bestElo,
-      bestEloTier: demoHeroStats.bestEloTier,
-      clubCount: demoFamilyClubs.length,
-      topPusher: { name: demoTopPushers[0].name, trophies: demoTopPushers[0].trophies },
-    };
-  }
+  if (!clans || clans.length === 0 || !trophees) return null;
 
   const totalTrophies = trophees.reduce((sum, p) => sum + (p.trophies ?? 0), 0);
-  let bestElo = demoHeroStats.bestElo;
-  let bestEloTier = demoHeroStats.bestEloTier;
+
+  let bestElo: number | null = null;
+  let bestEloTier: string | null = null;
   if (ranked && Object.keys(ranked.players).length > 0) {
     const top = Object.values(ranked.players).sort((a, b) => b.ranked_pts - a.ranked_pts)[0];
     bestElo = top.ranked_pts;
@@ -235,7 +225,7 @@ export async function getCommunityStats() {
 
   // "Meilleur pusher" = plus grosse progression de trophées cette saison
   // (même donnée que !evo), pas le plus gros total de trophées.
-  let topPusher = { name: demoTopPushers[0].name, trophies: demoTopPushers[0].trophies };
+  let topPusher: { name: string; trophies: string } | null = null;
   if (evolution && evolution.players.length > 0) {
     const top = evolution.players.slice().sort((a, b) => b.delta - a.delta)[0];
     topPusher = { name: top.name, trophies: `${top.delta >= 0 ? "+" : ""}${formatNumber(top.delta)}` };
@@ -288,28 +278,6 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
   const detail = await getFamilyClanDetail(rawTag);
 
   if (!detail) {
-    if (club.isFlagship) {
-      return {
-        name: club.name,
-        tag: club.tag,
-        slug: club.slug,
-        description: demoFlagshipClub.description,
-        typeLabel: demoFlagshipClub.type,
-        requiredTrophies: demoFlagshipClub.requiredTrophies,
-        trophies: club.trophies,
-        memberCount: club.memberCount,
-        isFlagship: true,
-        roster: demoClubRoster.map((m) => ({
-          rank: m.rank,
-          tag: m.name,
-          name: m.name,
-          trophies: m.trophies,
-          role: m.role,
-          color: m.color,
-        })),
-        synced: false,
-      };
-    }
     return {
       name: club.name,
       tag: club.tag,
@@ -352,15 +320,11 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
   };
 }
 
-export async function getCurrentSeasonProgress() {
+export type CurrentSeasonProgress = { topClubTrophies: string; topPlayer: string; topPlayerDelta: string };
+
+export async function getCurrentSeasonProgress(): Promise<CurrentSeasonProgress | null> {
   const evolution = await getFamilyEvolution();
-  if (!evolution || evolution.players.length === 0) {
-    return {
-      topClubTrophies: demoSeasons[0].topClubTrophies,
-      topPlayer: demoSeasons[0].topPlayer,
-      topPlayerDelta: demoSeasons[0].topPlayerDelta,
-    };
-  }
+  if (!evolution || evolution.players.length === 0) return null;
 
   const totalDelta = evolution.players.reduce((sum, p) => sum + p.delta, 0);
   const topMover = evolution.players.slice().sort((a, b) => b.delta - a.delta)[0];
@@ -434,11 +398,9 @@ function formatCountdown(ms: number): string {
   return `Encore ${days}j ${hours}h`;
 }
 
-export async function getCurrentSeasonInfo(): Promise<{ label: string; timeLeft: string }> {
+export async function getCurrentSeasonInfo(): Promise<{ label: string; timeLeft: string } | null> {
   const evolution = await getFamilyEvolution();
-  if (!evolution || !evolution.season_month) {
-    return { label: demoHeroStats.currentSeason, timeLeft: demoHeroStats.seasonTimeLeft };
-  }
+  if (!evolution || !evolution.season_month) return null;
 
   const now = parisWallClock(new Date());
   const reset = nextSeasonReset(now);

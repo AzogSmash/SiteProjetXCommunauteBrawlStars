@@ -29,6 +29,10 @@ export type ApiRankedPlayer = {
   ranked_tier: string;
   highest_ranked_pts: number | null;
   highest_ranked_tier: string | null;
+  // Index de palier officiel — clé de tri fiable pour le classement all-time
+  // (voir buildAllTimeRankedLeaderboard dans lib/family.ts), contrairement à
+  // highest_ranked_pts qui n'est pas comparable pour les vieux records.
+  highest_ranked_rank: number | null;
 };
 
 export type ApiRanked = {
