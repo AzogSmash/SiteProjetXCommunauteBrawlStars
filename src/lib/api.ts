@@ -6,6 +6,11 @@
 
 const API_BASE = process.env.BS_API_URL;
 const TIMEOUT_MS = 5000;
+// Rafraîchissement par défaut de toutes les données du site — 30 min
+// (demande du 22/07/2026). Le rôle Discord de la personne connectée est
+// l'exception explicite : voir REVALIDATE_REALTIME sur getDiscordMember.
+const REVALIDATE_DEFAULT = 1800;
+const REVALIDATE_REALTIME = 0;
 
 export type ApiClan = { tag: string; name: string; slug: string; alias: string };
 
@@ -57,14 +62,18 @@ export type ApiEvolution = {
   players: ApiEvolutionEntry[];
 };
 
-async function getJson<T>(path: string, headers?: Record<string, string>): Promise<T | null> {
+async function getJson<T>(
+  path: string,
+  options?: { headers?: Record<string, string>; revalidate?: number }
+): Promise<T | null> {
   if (!API_BASE) return null;
+  const { headers, revalidate = REVALIDATE_DEFAULT } = options ?? {};
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
     const res = await fetch(`${API_BASE}${path}`, {
       signal: controller.signal,
-      next: { revalidate: 60 },
+      next: { revalidate },
       headers,
     });
     clearTimeout(timeout);
@@ -131,8 +140,14 @@ function internalHeaders(): Record<string, string> | undefined {
   return secret ? { "X-Internal-Secret": secret } : undefined;
 }
 
+// Le rôle de la personne connectée pilote les vues membre/staff/admin —
+// jamais mis en cache, revérifié à chaque requête (demande du 22/07/2026),
+// contrairement au reste des données du site.
 export function getDiscordMember(discordId: string) {
-  return getJson<ApiDiscordMember>(`/api/member/${encodeURIComponent(discordId)}`, internalHeaders());
+  return getJson<ApiDiscordMember>(`/api/member/${encodeURIComponent(discordId)}`, {
+    headers: internalHeaders(),
+    revalidate: REVALIDATE_REALTIME,
+  });
 }
 
 // Panel staff (voir lib/access.ts) — arrivées récentes, journal d'audit de
@@ -157,5 +172,5 @@ export type ApiStaffPanel = {
 };
 
 export function getStaffPanel() {
-  return getJson<ApiStaffPanel>("/api/staff/panel", internalHeaders());
+  return getJson<ApiStaffPanel>("/api/staff/panel", { headers: internalHeaders() });
 }
