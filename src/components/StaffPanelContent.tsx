@@ -1,4 +1,4 @@
-import { Users, UserPlus, ShieldAlert, VolumeX, Ban, Lock, LockOpen, Radio, Flag, TrendingUp } from "lucide-react";
+import { Users, UserPlus, ShieldAlert, VolumeX, Ban, Lock, LockOpen, Radio, Flag, TrendingUp, FileSpreadsheet } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
 import { getStaffPanel, getFamilyEvolution, type ApiEvolutionEntry, type ApiModerationEntry, type ModerationAction } from "@/lib/api";
@@ -89,6 +89,16 @@ export async function StaffPanelContent() {
 
   return (
     <>
+      <div className="mb-6 flex justify-end">
+        <a
+          href="/api/export"
+          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-2 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(113,54,186,0.3)] transition-transform hover:scale-[1.03]"
+        >
+          <FileSpreadsheet size={16} />
+          Exporter les classements (Excel)
+        </a>
+      </div>
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatItem icon={Users} label="Clans suivis" value={String(clubRows.length)} sub="SAISON EN COURS" numeric />
         <StatItem
