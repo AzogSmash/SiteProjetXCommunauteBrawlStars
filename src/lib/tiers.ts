@@ -4,8 +4,8 @@
 // "Légendaire".
 export function tierColorClass(tier: string): string {
   const t = tier.toLowerCase();
-  if (t.includes("pro")) return "text-foreground font-black";
-  if (t.includes("masters")) return "text-fuchsia-600";
+  if (t.includes("pro")) return "text-emerald-600 font-black";
+  if (t.includes("masters")) return "text-yellow-500";
   if (t.includes("légende") || t.includes("legende")) return "text-red-500";
   if (t.includes("mythique")) return "text-primary-2";
   if (t.includes("diamant")) return "text-sky-500";
