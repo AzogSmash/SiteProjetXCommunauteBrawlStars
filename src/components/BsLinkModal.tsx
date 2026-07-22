@@ -1,17 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { X, Loader2, CircleCheck } from "lucide-react";
+import { linkBsAccount } from "@/app/actions/bslink";
+import { formatNumber } from "@/lib/format";
 
 const DISMISS_KEY = "px-bslink-prompt-dismissed";
 
-// Popup proposant de lier son compte Brawl Stars (!bslink), affichée aux
-// membres du Discord connectés au site qui n'ont pas encore de compte lié
-// (demande du 22/07/2026). Un dismiss retient le choix en local — pas la
-// peine de re-solliciter à chaque page une fois refusé une fois.
+// Popup proposant de lier son compte Brawl Stars, affichée aux membres du
+// Discord connectés au site qui n'ont pas encore de compte lié (demande du
+// 22/07/2026). La liaison se fait directement ici (formulaire -> server
+// action -> !bslink côté bot) plutôt que de juste renvoyer vers Discord. Un
+// dismiss retient le choix en local — pas la peine de re-solliciter à
+// chaque page une fois refusé une fois.
 export function BsLinkModal({ shouldShow }: { shouldShow: boolean }) {
   const [open, setOpen] = useState(false);
+  const [tag, setTag] = useState("");
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!shouldShow) return;
@@ -26,6 +33,23 @@ export function BsLinkModal({ shouldShow }: { shouldShow: boolean }) {
   function dismiss() {
     localStorage.setItem(DISMISS_KEY, "1");
     setOpen(false);
+  }
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!tag.trim() || isPending) return;
+    startTransition(async () => {
+      const res = await linkBsAccount(tag);
+      if (res.ok) {
+        localStorage.setItem(DISMISS_KEY, "1");
+        setResult({
+          ok: true,
+          message: `${res.name} — ${formatNumber(res.trophies)} 🏆${res.tier ? ` · ${res.tier}` : ""}`,
+        });
+      } else {
+        setResult({ ok: false, message: res.error });
+      }
+    });
   }
 
   if (!open) return null;
@@ -57,6 +81,7 @@ export function BsLinkModal({ shouldShow }: { shouldShow: boolean }) {
             width={933}
             height={414}
             className="w-full"
+            priority
           />
         </div>
         <p className="mt-2 text-xs text-muted">
@@ -64,15 +89,37 @@ export function BsLinkModal({ shouldShow }: { shouldShow: boolean }) {
           juste sous ton pseudo, sur ta fiche de profil en jeu.
         </p>
 
-        <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-3 text-sm text-foreground">
-          Sur Discord, tape : <span className="font-mono font-semibold text-primary-2">!bslink #TONTAG</span>
-        </div>
+        {result?.ok ? (
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700">
+            <CircleCheck size={16} className="shrink-0" />
+            Compte lié : {result.message}
+          </div>
+        ) : (
+          <form onSubmit={submit} className="mt-4 flex flex-col gap-2">
+            <input
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+              placeholder="#TONTAG"
+              disabled={isPending}
+              className="rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm text-foreground outline-none focus:border-primary/50"
+            />
+            {result && !result.ok && <p className="text-xs text-red-500">{result.message}</p>}
+            <button
+              type="submit"
+              disabled={isPending || !tag.trim()}
+              className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-2 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(113,54,186,0.3)] transition-transform hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+            >
+              {isPending && <Loader2 size={15} className="animate-spin" />}
+              Lier mon compte
+            </button>
+          </form>
+        )}
 
         <button
           onClick={dismiss}
-          className="mt-4 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-muted transition-colors hover:text-foreground"
+          className="mt-3 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-muted transition-colors hover:text-foreground"
         >
-          Plus tard
+          {result?.ok ? "Fermer" : "Plus tard"}
         </button>
       </div>
     </div>
