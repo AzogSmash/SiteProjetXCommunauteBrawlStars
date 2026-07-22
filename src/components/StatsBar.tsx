@@ -1,7 +1,9 @@
-import { Users, TrendingUp, Shield } from "lucide-react";
+import { Users, TrendingUp } from "lucide-react";
 import { StatItem } from "./StatItem";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
+import { MembersIcon } from "./MembersIcon";
+import { SeasonClock } from "./SeasonClock";
 import type { CommunityStats } from "@/lib/family";
 
 const NOT_SYNCED = "Pas encore synchronisé";
@@ -26,6 +28,7 @@ export function StatsBar({
     },
     {
       icon: Users,
+      iconNode: <MembersIcon size={26} />,
       label: "Nombre de joueurs",
       value: stats ? String(stats.activePlayers) : "—",
       sub: "ACTIFS",
@@ -46,7 +49,8 @@ export function StatsBar({
       sub: stats?.topPusher ? `${stats.topPusher.trophies} 🏆` : NOT_SYNCED,
     },
     {
-      icon: Shield,
+      icon: Users,
+      iconNode: <SeasonClock size={26} />,
       label: "Saison en cours",
       value: currentSeason ?? "—",
       sub: seasonTimeLeft ?? NOT_SYNCED,

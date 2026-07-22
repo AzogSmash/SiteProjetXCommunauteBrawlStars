@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Shield, Clock, ChevronRight } from "lucide-react";
+import { Shield, ChevronRight } from "lucide-react";
 import { LogoMark } from "./Logo";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
+import { SeasonClock } from "./SeasonClock";
 import type { FamilyClub, RankedPlayer } from "@/lib/family";
 
 export function HeroHighlights({
@@ -75,7 +76,7 @@ export function HeroHighlights({
             <p className="text-xs text-muted">Saison en cours</p>
           </div>
           <div className="flex items-center gap-1 text-sm font-semibold text-foreground/90">
-            <Clock size={14} className="text-primary-2" />
+            <SeasonClock size={16} />
             {seasonTimeLeft}
           </div>
         </div>

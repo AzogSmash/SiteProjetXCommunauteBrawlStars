@@ -1,9 +1,10 @@
 import Image from "next/image";
-import { Clock, Crown } from "lucide-react";
+import { Crown } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { Avatar } from "@/components/Avatar";
-import { TrophyIcon } from "@/components/TrophyIcon";
+import { PushArrow } from "@/components/PushArrow";
+import { SeasonClock } from "@/components/SeasonClock";
 import { DataUnavailable } from "@/components/DataUnavailable";
 import {
   getCurrentSeasonProgress,
@@ -41,7 +42,7 @@ export default async function PusheursPage() {
             </div>
             {season && (
               <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground">
-                <Clock size={16} className="text-primary-2" />
+                <SeasonClock size={16} />
                 {season.timeLeft}
               </div>
             )}
@@ -50,7 +51,7 @@ export default async function PusheursPage() {
           {current ? (
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
-                <TrophyIcon size={24} />
+                <PushArrow value={current.topClubTrophies} size={24} />
                 <div>
                   <p className="text-xs text-muted">Trophées gagnés par la famille</p>
                   <p className="text-sm font-bold text-foreground">{current.topClubTrophies}</p>
@@ -60,8 +61,12 @@ export default async function PusheursPage() {
                 <Crown size={18} className="text-primary-2" />
                 <div>
                   <p className="text-xs text-muted">Roi du push</p>
-                  <p className="text-sm font-bold text-foreground">
-                    {current.topPlayer} <span className="text-primary-2">{current.topPlayerDelta}</span>
+                  <p className="flex items-center gap-1 text-sm font-bold text-foreground">
+                    {current.topPlayer}
+                    <span className="flex items-center gap-1 text-primary-2">
+                      {current.topPlayerDelta}
+                      <PushArrow value={current.topPlayerDelta} size={14} />
+                    </span>
                   </p>
                 </div>
               </div>
@@ -105,8 +110,8 @@ export default async function PusheursPage() {
                     )}
                   </span>
                   <span className="flex items-center gap-1 text-sm font-semibold text-primary-2">
-                    <TrophyIcon size={16} />
                     {player.trophies}
+                    <PushArrow value={player.trophies} size={16} />
                   </span>
                 </li>
               ))}
@@ -146,7 +151,10 @@ export default async function PusheursPage() {
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground/90">
                     <Crown size={16} className="text-primary-2" />
                     {s.topPlayer}
-                    <span className="text-primary-2">{s.topPlayerDelta}</span>
+                    <span className="flex items-center gap-1 text-primary-2">
+                      {s.topPlayerDelta}
+                      {s.topPlayerDelta && <PushArrow value={s.topPlayerDelta} size={14} />}
+                    </span>
                   </div>
                 </div>
               ))}

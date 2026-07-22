@@ -1,7 +1,7 @@
 import type { Player } from "@/lib/family";
 import { Panel } from "./Panel";
 import { Avatar } from "./Avatar";
-import { TrophyIcon } from "./TrophyIcon";
+import { PushArrow } from "./PushArrow";
 import { DataUnavailable } from "./DataUnavailable";
 
 export function TopPushers({ pushers }: { pushers: Player[] }) {
@@ -25,7 +25,7 @@ export function TopPushers({ pushers }: { pushers: Player[] }) {
               <span className="text-sm font-semibold text-foreground/90">
                 {player.trophies}
               </span>
-              <TrophyIcon size={16} />
+              <PushArrow value={player.trophies} size={16} />
             </li>
           ))}
         </ul>

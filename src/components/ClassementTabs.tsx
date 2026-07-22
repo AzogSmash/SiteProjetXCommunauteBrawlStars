@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, CircleCheck, CircleX, Clock } from "lucide-react";
+import { Crown } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
+import { SeasonClock } from "./SeasonClock";
 import { tierColorClass } from "@/lib/tiers";
 import { colorFromSeed, formatNumber } from "@/lib/format";
 import { formatSeasonEndLabel, type SeasonCategory } from "@/lib/seasonReset";
@@ -84,7 +85,7 @@ export function ClassementTabs({
         <div className="flex items-center gap-3">
           {seasonLabel && (
             <span className="card-elevated relative -top-8 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/25 bg-surface px-3 py-1 text-[11px] font-semibold text-primary-2">
-              <Clock size={11} />
+              <SeasonClock size={13} />
               {seasonLabel}
             </span>
           )}
@@ -183,11 +184,11 @@ export function ClassementTabs({
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
               <span className="hidden items-center gap-3 text-xs sm:flex">
                 <span className="flex items-center gap-1 font-semibold text-emerald-600">
-                  <CircleCheck size={13} />
+                  <Image src="/check.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
                   {p.wins}
                 </span>
                 <span className="flex items-center gap-1 font-semibold text-red-500">
-                  <CircleX size={13} />
+                  <Image src="/croix.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
                   {p.losses}
                 </span>
               </span>
