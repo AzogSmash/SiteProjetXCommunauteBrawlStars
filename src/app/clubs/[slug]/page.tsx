@@ -85,7 +85,7 @@ export default async function ClubDetailPage({
           ) : (
             <ul className="flex flex-col gap-1">
               {club.roster.map((member) => (
-                <li key={member.tag} className="flex items-center gap-3 rounded-xl px-3 py-2.5">
+                <li key={member.tag} className="flex items-center gap-3 rounded-xl px-3 py-2.5 odd:bg-surface-2">
                   <span className="w-5 text-sm font-bold text-muted">{member.rank}</span>
                   <Avatar name={member.name} color={member.color} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">

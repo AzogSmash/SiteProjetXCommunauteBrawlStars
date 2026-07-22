@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Swords } from "lucide-react";
+import { Crown, Swords, Clock } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
@@ -82,7 +82,8 @@ export function ClassementTabs({
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">Classements</h2>
         <div className="flex items-center gap-3">
           {seasonLabel && (
-            <span className="-mt-8 whitespace-nowrap rounded-full bg-gradient-to-r from-primary to-primary-2 px-3 py-1 text-[11px] font-semibold text-white shadow-md">
+            <span className="card-elevated relative -top-8 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/25 bg-surface px-3 py-1 text-[11px] font-semibold text-primary-2">
+              <Clock size={11} />
               {seasonLabel}
             </span>
           )}
@@ -114,7 +115,7 @@ export function ClassementTabs({
       {active === "ranked" && (
         <ul className="flex flex-col gap-0.5">
           {ranked.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
@@ -138,7 +139,7 @@ export function ClassementTabs({
             </p>
           )}
           {rankedAllTime.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
@@ -156,19 +157,13 @@ export function ClassementTabs({
       {active === "trophees" && (
         <ul className="flex flex-col gap-0.5">
           {trophees.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
                 {p.name}
                 {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
               </span>
-              {p.elo !== undefined && (
-                <span className="hidden items-center gap-1 text-sm font-semibold text-foreground/90 sm:flex">
-                  <Image src="/icons/ranked.png" alt="" width={16} height={16} />
-                  {p.elo}
-                </span>
-              )}
               <span className="flex w-24 items-center justify-end gap-1 text-right text-sm font-semibold text-foreground/90">
                 {p.trophies}
                 <TrophyIcon size={16} />
@@ -184,7 +179,7 @@ export function ClassementTabs({
             <p className="px-3 py-6 text-sm text-muted">Aucun duel joué pour l&apos;instant.</p>
           )}
           {duel1v1.map((p, i) => (
-            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
@@ -205,7 +200,7 @@ export function ClassementTabs({
             <p className="px-3 py-6 text-sm text-muted">Personne n&apos;a encore de jetons.</p>
           )}
           {casino.map((p, i) => (
-            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>

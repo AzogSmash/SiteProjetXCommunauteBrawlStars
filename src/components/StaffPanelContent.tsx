@@ -65,7 +65,7 @@ function ModerationRow({ entry }: { entry: ApiModerationEntry }) {
   const meta = MODERATION_META[entry.action];
   const Icon = meta.icon;
   return (
-    <li className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm">
+    <li className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm odd:bg-surface-2">
       <IconChip tone={meta.tone}>
         <Icon size={15} />
       </IconChip>
@@ -135,7 +135,7 @@ export async function StaffPanelContent() {
           ) : (
             <ul className="flex flex-col gap-1">
               {clubRows.map((row) => (
-                <li key={row.club} className="flex items-center gap-3 rounded-xl px-3 py-2.5">
+                <li key={row.club} className="flex items-center gap-3 rounded-xl px-3 py-2.5 odd:bg-surface-2">
                   <IconChip>
                     <TrendingUp size={15} />
                   </IconChip>
@@ -163,7 +163,7 @@ export async function StaffPanelContent() {
           ) : (
             <ul className="flex flex-col gap-1">
               {panel.recent_members.map((m) => (
-                <li key={m.name + m.joined_at} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm">
+                <li key={m.name + m.joined_at} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm odd:bg-surface-2">
                   <IconChip>
                     <UserPlus size={14} />
                   </IconChip>
@@ -186,7 +186,7 @@ export async function StaffPanelContent() {
                 <ModerationRow key={`mod-${i}`} entry={entry} />
               ))}
               {panel.reports.map((r, i) => (
-                <li key={`report-${i}`} className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm">
+                <li key={`report-${i}`} className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-sm odd:bg-surface-2">
                   <IconChip tone="red">
                     <Flag size={15} />
                   </IconChip>

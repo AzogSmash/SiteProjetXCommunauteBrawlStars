@@ -83,7 +83,7 @@ export default async function PusheursPage() {
           >
             <ul className="flex flex-col gap-0.5">
               {pushers.map((player) => (
-                <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+                <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                   <span className="w-6 text-sm font-bold text-muted">{player.rank}</span>
                   <Avatar name={player.name} color={player.color} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">

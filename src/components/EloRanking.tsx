@@ -20,7 +20,7 @@ export function EloRanking({ players }: { players: RankedPlayer[] }) {
     >
       <ul className="flex flex-col gap-0.5">
         {players.map((player) => (
-          <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2">
+          <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
             <span className="flex w-4 justify-center">
               {player.rank <= 3 ? (
                 <Crown size={15} color={crownColor[player.rank]} fill={crownColor[player.rank]} />
