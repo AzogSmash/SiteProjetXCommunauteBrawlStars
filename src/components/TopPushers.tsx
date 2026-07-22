@@ -1,7 +1,7 @@
-import Image from "next/image";
 import type { Player } from "@/lib/family";
 import { Panel } from "./Panel";
 import { Avatar } from "./Avatar";
+import { TrophyIcon } from "./TrophyIcon";
 
 export function TopPushers({ pushers }: { pushers: Player[] }) {
   return (
@@ -21,7 +21,7 @@ export function TopPushers({ pushers }: { pushers: Player[] }) {
             <span className="text-sm font-semibold text-foreground/90">
               {player.trophies}
             </span>
-            <Image src="/icons/ranked.png" alt="" width={16} height={16} />
+            <TrophyIcon size={16} />
           </li>
         ))}
       </ul>

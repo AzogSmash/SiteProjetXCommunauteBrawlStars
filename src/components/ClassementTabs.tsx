@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Crown, Swords } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
 import { tierColorClass } from "@/lib/tiers";
 import { colorFromSeed, formatNumber } from "@/lib/format";
+import { formatSeasonEndLabel, type SeasonCategory } from "@/lib/seasonReset";
 import type { RankedPlayer, Player } from "@/lib/family";
 import type { Api1v1Player, ApiCasinoPlayer } from "@/lib/api";
 
@@ -20,6 +22,15 @@ const TABS = [
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
+
+// Onglets qui ont une vraie notion de saison qui se termine — "ranked
+// all-time" est un record permanent, pas de reset, donc pas de bulle.
+const SEASON_CATEGORY: Partial<Record<TabId, SeasonCategory>> = {
+  ranked: "ranked",
+  trophees: "trophees",
+  "1v1": "1v1",
+  casino: "casino",
+};
 
 const crownColor: Record<number, string> = { 1: "#facc15", 2: "#d1d5db", 3: "#c2833f" };
 
@@ -58,8 +69,32 @@ export function ClassementTabs({
 }) {
   const [active, setActive] = useState<TabId>(isTabId(initialTab) ? initialTab : "ranked");
 
+  // Calcul direct au rendu (précision à l'heure près, pas à la seconde —
+  // un désaccord d'hydratation serveur/client n'arriverait que si la
+  // requête traverse pile une frontière d'heure, sans conséquence si ça
+  // arrive : juste un avertissement console, pas de plantage).
+  const seasonCategory = SEASON_CATEGORY[active];
+  const seasonLabel = seasonCategory ? formatSeasonEndLabel(seasonCategory) : null;
+
   return (
-    <div>
+    <div className="card-elevated relative rounded-2xl border border-border bg-surface p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">Classements</h2>
+        <div className="flex items-center gap-3">
+          {seasonLabel && (
+            <span className="-mt-8 whitespace-nowrap rounded-full bg-gradient-to-r from-primary to-primary-2 px-3 py-1 text-[11px] font-semibold text-white shadow-md">
+              {seasonLabel}
+            </span>
+          )}
+          <Link
+            href="/clubs"
+            className="text-xs font-semibold uppercase tracking-wide text-primary-2 hover:text-primary"
+          >
+            Voir les clubs
+          </Link>
+        </div>
+      </div>
+
       <div className="mb-4 flex w-fit gap-1 rounded-full border border-border bg-surface p-1">
         {TABS.map((tab) => (
           <button

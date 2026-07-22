@@ -3,6 +3,7 @@ import { Clock, Crown } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { Avatar } from "@/components/Avatar";
+import { TrophyIcon } from "@/components/TrophyIcon";
 import {
   getCurrentSeasonProgress,
   getSeasonHistory,
@@ -45,7 +46,7 @@ export default async function PusheursPage() {
 
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
-              <Image src="/icons/ranked.png" alt="" width={24} height={24} />
+              <TrophyIcon size={24} />
               <div>
                 <p className="text-xs text-muted">Trophées gagnés par la famille</p>
                 <p className="text-sm font-bold text-foreground">{current.topClubTrophies}</p>
@@ -92,7 +93,7 @@ export default async function PusheursPage() {
                     )}
                   </span>
                   <span className="flex items-center gap-1 text-sm font-semibold text-primary-2">
-                    <Image src="/icons/ranked.png" alt="" width={16} height={16} />
+                    <TrophyIcon size={16} />
                     {player.trophies}
                   </span>
                 </li>
