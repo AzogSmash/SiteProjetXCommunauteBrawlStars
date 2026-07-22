@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Swords, Clock } from "lucide-react";
+import { Crown, CircleCheck, CircleX, Clock } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
@@ -183,9 +183,15 @@ export function ClassementTabs({
               <Rank rank={i + 1} />
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
-              <span className="hidden items-center gap-1 text-xs text-muted sm:flex">
-                <Swords size={12} />
-                {p.wins}V / {p.losses}D
+              <span className="hidden items-center gap-3 text-xs sm:flex">
+                <span className="flex items-center gap-1 font-semibold text-emerald-600">
+                  <CircleCheck size={13} />
+                  {p.wins}
+                </span>
+                <span className="flex items-center gap-1 font-semibold text-red-500">
+                  <CircleX size={13} />
+                  {p.losses}
+                </span>
               </span>
               <span className="text-xs font-bold uppercase tracking-wide text-primary-2">{p.tier}</span>
               <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.points}</span>
