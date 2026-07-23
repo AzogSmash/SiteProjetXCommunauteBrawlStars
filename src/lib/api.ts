@@ -129,13 +129,39 @@ export function getFamilySeasonArchive(month: string) {
   return getJson<ApiSeasonArchive>(`/api/famille/evolution/${encodeURIComponent(month)}`);
 }
 
-export type Api1v1Player = { name: string; points: number; wins: number; losses: number; tier: string };
+export type Api1v1Player = { name: string; tag: string | null; points: number; wins: number; losses: number; tier: string };
 
 export function getFamilyClassement1v1() {
   return getJson<Api1v1Player[]>("/api/famille/classement_1v1");
 }
 
-export type ApiCasinoPlayer = { name: string; coins: number };
+export type ApiPlayerProfile = {
+  tag: string;
+  name: string;
+  club: string | null;
+  role: ApiClubRole | null;
+  trophies: number;
+  ranked_pts: number | null;
+  ranked_tier: string | null;
+  highest_ranked_pts: number | null;
+  highest_ranked_tier: string | null;
+  highest_ranked_rank: number | null;
+  duel_1v1: { points: number; wins: number; losses: number; tier: string } | null;
+  casino_coins: number | null;
+  victories_3v3: number | null;
+  victories_solo: number | null;
+  victories_duo: number | null;
+  exp_level: number | null;
+  discord_id: string | null;
+  bio: string | null;
+  screenshot_url: string | null;
+};
+
+export function getFamilyJoueur(tag: string) {
+  return getJson<ApiPlayerProfile>(`/api/famille/joueur/${encodeURIComponent(tag)}`);
+}
+
+export type ApiCasinoPlayer = { name: string; tag: string | null; coins: number };
 
 export function getFamilyClassementCasino() {
   return getJson<ApiCasinoPlayer[]>("/api/famille/classement_casino");

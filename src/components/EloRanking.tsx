@@ -5,6 +5,7 @@ import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { tierColorClass } from "@/lib/tiers";
 import { DataUnavailable } from "./DataUnavailable";
+import { PlayerLink } from "./PlayerLink";
 
 const crownColor: Record<number, string> = {
   1: "#facc15",
@@ -34,7 +35,7 @@ export function EloRanking({ players }: { players: RankedPlayer[] }) {
               </span>
               <Avatar name={player.name} color={player.color} />
               <span className="flex-1 truncate text-sm font-medium text-foreground/90">
-                {player.name}
+                <PlayerLink tag={player.tag}>{player.name}</PlayerLink>
               </span>
               <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(player.tier)}`}>
                 {player.tier}

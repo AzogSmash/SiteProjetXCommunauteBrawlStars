@@ -8,6 +8,7 @@ import { RoleBadge } from "@/components/RoleBadge";
 import { StatItem } from "@/components/StatItem";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { LockIcon } from "@/components/LockIcon";
+import { PlayerLink } from "@/components/PlayerLink";
 import { getClubDetail } from "@/lib/family";
 import { discordInviteUrl } from "@/lib/data";
 
@@ -89,7 +90,7 @@ export default async function ClubDetailPage({
                   <span className="w-5 text-sm font-bold text-muted">{member.rank}</span>
                   <Avatar name={member.name} color={member.color} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                    {member.name}
+                    <PlayerLink tag={member.tag}>{member.name}</PlayerLink>
                   </span>
                   <RoleBadge role={member.role} />
                   <span className="w-24 text-right text-sm font-semibold text-foreground/90">

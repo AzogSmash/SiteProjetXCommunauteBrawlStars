@@ -6,6 +6,7 @@ import { Avatar } from "@/components/Avatar";
 import { PushArrow } from "@/components/PushArrow";
 import { SeasonClock } from "@/components/SeasonClock";
 import { DataUnavailable } from "@/components/DataUnavailable";
+import { PlayerLink } from "@/components/PlayerLink";
 import {
   getCurrentSeasonProgress,
   getSeasonHistory,
@@ -104,7 +105,7 @@ export default async function PusheursPage() {
                   <span className="w-6 text-sm font-bold text-muted">{player.rank}</span>
                   <Avatar name={player.name} color={player.color} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                    {player.name}
+                    <PlayerLink tag={player.tag}>{player.name}</PlayerLink>
                     {player.club && (
                       <span className="ml-2 text-xs font-normal text-muted">{player.club}</span>
                     )}

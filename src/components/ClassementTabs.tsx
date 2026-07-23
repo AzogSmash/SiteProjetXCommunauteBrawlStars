@@ -14,6 +14,7 @@ import { formatSeasonEndLabel, type SeasonCategory } from "@/lib/seasonReset";
 import type { RankedPlayer, Player } from "@/lib/family";
 import type { Api1v1Player, ApiCasinoPlayer } from "@/lib/api";
 import { DataUnavailable } from "./DataUnavailable";
+import { PlayerLink } from "./PlayerLink";
 
 const TABS = [
   { id: "ranked", label: "Ranked" },
@@ -122,7 +123,7 @@ export function ClassementTabs({
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                {p.name}
+                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                 {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
               </span>
               <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
@@ -143,7 +144,7 @@ export function ClassementTabs({
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                {p.name}
+                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                 {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
               </span>
               <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
@@ -162,7 +163,7 @@ export function ClassementTabs({
               <Rank rank={p.rank} />
               <Avatar name={p.name} color={p.color} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                {p.name}
+                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                 {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
               </span>
               <span className="flex w-24 items-center justify-end gap-1 text-right text-sm font-semibold text-foreground/90">
@@ -181,7 +182,9 @@ export function ClassementTabs({
             <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+              </span>
               <span className="hidden items-center gap-3 text-xs sm:flex">
                 <span className="flex items-center gap-1 font-semibold text-emerald-600">
                   <Image src="/check.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
@@ -206,7 +209,9 @@ export function ClassementTabs({
             <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
               <Rank rank={i + 1} />
               <Avatar name={p.name} color={colorFromSeed(p.name)} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">{p.name}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+              </span>
               <span className="flex items-center gap-1 text-sm font-semibold text-amber-600">
                 <Image src="/icons/coins.png" alt="" width={16} height={16} style={{ width: 16, height: 16 }} />
                 {formatNumber(p.coins)}

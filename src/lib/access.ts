@@ -65,3 +65,16 @@ export async function getAccessContext(): Promise<AccessContext> {
 
   return { loggedIn: true, inGuild: true, tier, clubSlug, bsLinked: member.bs_linked };
 }
+
+// Badge staff/admin pour un ID Discord donné (pas forcément la personne
+// connectée — utilisé sur les pages profil joueur, publiques). Réutilise la
+// même logique que le tier ci-dessus, sans exposer role_ids brut au client.
+export async function getDiscordBadge(discordId: string | null): Promise<{ isStaff: boolean; isAdmin: boolean }> {
+  if (!discordId) return { isStaff: false, isAdmin: false };
+  const member = await getDiscordMember(discordId);
+  if (!member) return { isStaff: false, isAdmin: false };
+  return {
+    isAdmin: member.is_admin,
+    isStaff: member.is_admin || member.role_ids.some((r) => STAFF_ROLE_IDS.has(r)),
+  };
+}

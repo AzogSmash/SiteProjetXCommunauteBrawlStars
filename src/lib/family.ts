@@ -6,9 +6,11 @@ import {
   getFamilyEvolution,
   getFamilySaisons,
   getFamilySeasonArchive,
+  getFamilyJoueur,
   type ApiClubRole,
 } from "./api";
 import { formatNumber, spaceClubName, colorFromSeed } from "./format";
+import { getDiscordBadge } from "./access";
 
 export type FamilyClub = {
   rank: number;
@@ -441,4 +443,66 @@ export async function getSeasonHistory(): Promise<SeasonArchiveSummary[] | null>
       };
     })
     .sort((a, b) => (a.id < b.id ? 1 : -1));
+}
+
+export type PlayerProfile = {
+  tag: string;
+  name: string;
+  club: string | null;
+  clubSlug: string | null;
+  role: ApiClubRole | null;
+  trophies: number;
+  rankedPts: number | null;
+  rankedTier: string | null;
+  highestRankedPts: number | null;
+  highestRankedTier: string | null;
+  duel1v1: { points: number; wins: number; losses: number; tier: string } | null;
+  casinoCoins: number | null;
+  victories3v3: number | null;
+  victoriesSolo: number | null;
+  victoriesDuo: number | null;
+  expLevel: number | null;
+  isStaff: boolean;
+  isAdmin: boolean;
+  discordLinked: boolean;
+  bio: string | null;
+  screenshotUrl: string | null;
+  color: string;
+};
+
+// null si ce tag n'a jamais été synchronisé (jamais membre d'un des clans
+// suivis par le bot) — voir /joueurs/[tag]/page.tsx qui appelle notFound()
+// dans ce cas.
+export async function getPlayerProfile(tag: string): Promise<PlayerProfile | null> {
+  const clean = tag.replace(/^#/, "").toUpperCase();
+  const [data, clans] = await Promise.all([getFamilyJoueur(clean), getFamilyClans()]);
+  if (!data) return null;
+
+  const { isStaff, isAdmin } = await getDiscordBadge(data.discord_id);
+  const clubSlug = data.club ? (clans?.find((c) => c.name === data.club)?.slug ?? null) : null;
+
+  return {
+    tag: data.tag,
+    name: data.name,
+    club: data.club,
+    clubSlug,
+    role: data.role as ApiClubRole | null,
+    trophies: data.trophies,
+    rankedPts: data.ranked_pts,
+    rankedTier: data.ranked_tier,
+    highestRankedPts: data.highest_ranked_pts,
+    highestRankedTier: data.highest_ranked_tier,
+    duel1v1: data.duel_1v1,
+    casinoCoins: data.casino_coins,
+    victories3v3: data.victories_3v3,
+    victoriesSolo: data.victories_solo,
+    victoriesDuo: data.victories_duo,
+    expLevel: data.exp_level,
+    isStaff,
+    isAdmin,
+    discordLinked: !!data.discord_id,
+    bio: data.bio,
+    screenshotUrl: data.screenshot_url,
+    color: colorFromSeed(data.tag),
+  };
 }

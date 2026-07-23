@@ -3,6 +3,7 @@ import { Panel } from "./Panel";
 import { Avatar } from "./Avatar";
 import { PushArrow } from "./PushArrow";
 import { DataUnavailable } from "./DataUnavailable";
+import { PlayerLink } from "./PlayerLink";
 
 export function TopPushers({ pushers }: { pushers: Player[] }) {
   return (
@@ -20,7 +21,7 @@ export function TopPushers({ pushers }: { pushers: Player[] }) {
               <span className="w-4 text-sm font-bold text-muted">{player.rank}</span>
               <Avatar name={player.name} color={player.color} />
               <span className="flex-1 truncate text-sm font-medium text-foreground/90">
-                {player.name}
+                <PlayerLink tag={player.tag}>{player.name}</PlayerLink>
               </span>
               <span className="text-sm font-semibold text-foreground/90">
                 {player.trophies}
