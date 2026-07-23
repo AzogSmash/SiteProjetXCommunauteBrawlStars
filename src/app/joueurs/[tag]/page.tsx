@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Users, ChevronRight, ShieldCheck, ImageOff, MessageSquareText, Link2, Unlink } from "lucide-react";
+import { Users, ChevronRight, ShieldCheck, MessageSquareText, Link2, Unlink } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
 import { RoleBadge } from "@/components/RoleBadge";
 import { TierIcon } from "@/components/TierIcon";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { PushArrow } from "@/components/PushArrow";
 import { DataUnavailable } from "@/components/DataUnavailable";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { getPlayerProfile } from "@/lib/family";
@@ -76,7 +77,24 @@ export default async function PlayerProfilePage({
       </section>
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6">
+          <Panel title={isOwner ? "Ma présentation" : "Présentation"}>
+            {isOwner ? (
+              <ProfileEditForm tag={profile.tag} initialBio={profile.bio} />
+            ) : profile.bio ? (
+              <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground/90">
+                <MessageSquareText size={16} className="mt-0.5 shrink-0 text-primary-2" />
+                {profile.bio}
+              </p>
+            ) : (
+              <p className="py-4 text-center text-sm text-muted">
+                {`${profile.name} n'a pas encore écrit de présentation.`}
+              </p>
+            )}
+          </Panel>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <StatItem icon={Users} iconNode={<TrophyIcon size={26} />} label="Trophées" value={formatNumber(profile.trophies)} sub="TOTAL" numeric />
           <StatItem
             icon={Users}
@@ -92,6 +110,14 @@ export default async function PlayerProfilePage({
             label="Ranked all-time"
             value={profile.highestRankedPts != null ? String(profile.highestRankedPts) : "—"}
             sub={profile.highestRankedTier ?? "Pas de données"}
+            numeric
+          />
+          <StatItem
+            icon={Users}
+            iconNode={profile.seasonPushDelta ? <PushArrow value={profile.seasonPushDelta} size={26} /> : undefined}
+            label="Push saison"
+            value={profile.seasonPushDelta ?? "—"}
+            sub={profile.seasonPushRank ? `#${profile.seasonPushRank} FAMILLE` : "Pas de données"}
             numeric
           />
           <StatItem
@@ -145,47 +171,6 @@ export default async function PlayerProfilePage({
             )}
           </Panel>
         </div>
-
-        {isOwner ? (
-          <div className="mt-6">
-            <Panel title="Modifier mon profil">
-              <ProfileEditForm tag={profile.tag} initialBio={profile.bio} screenshotUrl={profile.screenshotUrl} />
-            </Panel>
-          </div>
-        ) : (
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Panel title="Présentation">
-              {profile.bio ? (
-                <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground/90">
-                  <MessageSquareText size={16} className="mt-0.5 shrink-0 text-primary-2" />
-                  {profile.bio}
-                </p>
-              ) : (
-                <p className="py-4 text-center text-sm text-muted">
-                  {`${profile.name} n'a pas encore écrit de présentation.`}
-                </p>
-              )}
-            </Panel>
-
-            <Panel title="Screenshot du profil">
-              {profile.screenshotUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- image hébergée sur Supabase Storage, domaine pas ajouté à next/image
-                <img
-                  src={profile.screenshotUrl}
-                  alt={`Profil in-game de ${profile.name}`}
-                  className="w-full rounded-xl border border-border object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-2 py-8 text-center">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-2 text-muted">
-                    <ImageOff size={18} />
-                  </div>
-                  <p className="max-w-xs text-sm text-muted">Aucun screenshot ajouté pour l&apos;instant.</p>
-                </div>
-              )}
-            </Panel>
-          </div>
-        )}
       </main>
     </>
   );

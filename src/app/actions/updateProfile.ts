@@ -6,8 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 export type UpdateProfileResult = { ok: true } | { ok: false; error: string };
 
 const MAX_BIO_LENGTH = 280;
-const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
-const ALLOWED_SCREENSHOT_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 
 // Le discord_id vient TOUJOURS de la session serveur, jamais d'un paramètre
 // client (même logique que linkBsAccount) — sinon n'importe qui pourrait
@@ -31,25 +29,13 @@ export async function updatePlayerProfile(tag: string, formData: FormData): Prom
   if (!cleanTag) return { ok: false, error: "Tag invalide." };
 
   const bio = formData.get("bio");
-  const screenshot = formData.get("screenshot");
+  if (typeof bio === "string" && bio.length > MAX_BIO_LENGTH) {
+    return { ok: false, error: `Présentation trop longue (${MAX_BIO_LENGTH} caractères max).` };
+  }
 
   const upstream = new FormData();
   upstream.set("discord_id", discordId);
-  if (typeof bio === "string") {
-    if (bio.length > MAX_BIO_LENGTH) {
-      return { ok: false, error: `Présentation trop longue (${MAX_BIO_LENGTH} caractères max).` };
-    }
-    upstream.set("bio", bio);
-  }
-  if (screenshot instanceof File && screenshot.size > 0) {
-    if (!ALLOWED_SCREENSHOT_TYPES.has(screenshot.type)) {
-      return { ok: false, error: "Format d'image non supporté (PNG, JPEG ou WebP uniquement)." };
-    }
-    if (screenshot.size > MAX_SCREENSHOT_BYTES) {
-      return { ok: false, error: "Image trop lourde (5 Mo max)." };
-    }
-    upstream.set("screenshot", screenshot, screenshot.name);
-  }
+  if (typeof bio === "string") upstream.set("bio", bio);
 
   try {
     const controller = new AbortController();

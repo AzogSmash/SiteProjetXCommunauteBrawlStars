@@ -154,7 +154,6 @@ export type ApiPlayerProfile = {
   exp_level: number | null;
   discord_id: string | null;
   bio: string | null;
-  screenshot_url: string | null;
 };
 
 export function getFamilyJoueur(tag: string) {

@@ -6,24 +6,10 @@ import { updatePlayerProfile } from "@/app/actions/updateProfile";
 
 const MAX_BIO_LENGTH = 280;
 
-export function ProfileEditForm({
-  tag,
-  initialBio,
-  screenshotUrl,
-}: {
-  tag: string;
-  initialBio: string | null;
-  screenshotUrl: string | null;
-}) {
+export function ProfileEditForm({ tag, initialBio }: { tag: string; initialBio: string | null }) {
   const [bio, setBio] = useState(initialBio ?? "");
-  const [preview, setPreview] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ ok: boolean; message?: string } | null>(null);
-
-  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    setPreview(file ? URL.createObjectURL(file) : null);
-  }
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,11 +23,8 @@ export function ProfileEditForm({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4">
+    <form onSubmit={submit} className="flex flex-col gap-3">
       <div>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
-          Présentation
-        </label>
         <textarea
           name="bio"
           value={bio}
@@ -57,32 +40,10 @@ export function ProfileEditForm({
         </p>
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
-          Screenshot du profil
-        </label>
-        {(preview ?? screenshotUrl) && (
-          // eslint-disable-next-line @next/next/no-img-element -- prévisualisation locale (blob:) ou image Supabase Storage
-          <img
-            src={preview ?? screenshotUrl ?? undefined}
-            alt=""
-            className="mb-2 w-full rounded-xl border border-border object-cover"
-          />
-        )}
-        <input
-          type="file"
-          name="screenshot"
-          accept="image/png,image/jpeg,image/webp"
-          disabled={isPending}
-          onChange={onFileChange}
-          className="w-full text-xs text-muted file:mr-3 file:rounded-full file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary-2 hover:file:bg-primary/20"
-        />
-      </div>
-
       {result && !result.ok && <p className="text-xs text-red-500">{result.message}</p>}
       {result?.ok && (
         <p className="flex items-center gap-1 text-xs font-semibold text-emerald-600">
-          <CircleCheck size={13} /> Profil mis à jour.
+          <CircleCheck size={13} /> Présentation mise à jour.
         </p>
       )}
 

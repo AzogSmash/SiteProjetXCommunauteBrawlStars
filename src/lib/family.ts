@@ -466,7 +466,11 @@ export type PlayerProfile = {
   isAdmin: boolean;
   discordLinked: boolean;
   bio: string | null;
-  screenshotUrl: string | null;
+  // Progression de trophées depuis le début de la saison en cours (même
+  // donnée que !evo / la page Pusheurs) — null si le joueur n'a pas encore
+  // de point enregistré cette saison.
+  seasonPushDelta: string | null;
+  seasonPushRank: number | null;
   color: string;
 };
 
@@ -475,11 +479,27 @@ export type PlayerProfile = {
 // dans ce cas.
 export async function getPlayerProfile(tag: string): Promise<PlayerProfile | null> {
   const clean = tag.replace(/^#/, "").toUpperCase();
-  const [data, clans] = await Promise.all([getFamilyJoueur(clean), getFamilyClans()]);
+  const [data, clans, evolution] = await Promise.all([
+    getFamilyJoueur(clean),
+    getFamilyClans(),
+    getFamilyEvolution(),
+  ]);
   if (!data) return null;
 
   const { isStaff, isAdmin } = await getDiscordBadge(data.discord_id);
   const clubSlug = data.club ? (clans?.find((c) => c.name === data.club)?.slug ?? null) : null;
+
+  let seasonPushDelta: string | null = null;
+  let seasonPushRank: number | null = null;
+  if (evolution && evolution.players.length > 0) {
+    const sorted = evolution.players.slice().sort((a, b) => b.delta - a.delta);
+    const idx = sorted.findIndex((p) => p.tag === clean);
+    if (idx !== -1) {
+      const p = sorted[idx];
+      seasonPushDelta = `${p.delta >= 0 ? "+" : ""}${formatNumber(p.delta)}`;
+      seasonPushRank = idx + 1;
+    }
+  }
 
   return {
     tag: data.tag,
@@ -502,7 +522,8 @@ export async function getPlayerProfile(tag: string): Promise<PlayerProfile | nul
     isAdmin,
     discordLinked: !!data.discord_id,
     bio: data.bio,
-    screenshotUrl: data.screenshot_url,
+    seasonPushDelta,
+    seasonPushRank,
     color: colorFromSeed(data.tag),
   };
 }
