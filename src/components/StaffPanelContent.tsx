@@ -3,6 +3,7 @@ import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
 import { getStaffPanel, getFamilyEvolution, type ApiEvolutionEntry, type ApiModerationEntry, type ModerationAction } from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
+import { NewsPublishForm } from "@/components/NewsPublishForm";
 
 function groupByClub(players: ApiEvolutionEntry[]) {
   const byClub = new Map<string, { total: number; players: ApiEvolutionEntry[] }>();
@@ -99,6 +100,12 @@ export async function StaffPanelContent() {
           <FileSpreadsheet size={16} />
           Exporter les classements (Excel)
         </a>
+      </div>
+
+      <div className="mb-6">
+        <Panel title="Publier une actualité">
+          <NewsPublishForm />
+        </Panel>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

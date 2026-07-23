@@ -7,9 +7,11 @@ import {
   getFamilySaisons,
   getFamilySeasonArchive,
   getFamilyJoueur,
+  getFamilyActualites,
   type ApiClubRole,
+  type ApiNewsItem,
 } from "./api";
-import { formatNumber, spaceClubName, colorFromSeed } from "./format";
+import { formatNumber, spaceClubName, colorFromSeed, formatRelativeTime } from "./format";
 import { getDiscordBadge } from "./access";
 
 export type FamilyClub = {
@@ -526,4 +528,24 @@ export async function getPlayerProfile(tag: string): Promise<PlayerProfile | nul
     seasonPushRank,
     color: colorFromSeed(data.tag),
   };
+}
+
+export type NewsItem = {
+  icon: ApiNewsItem["icon"];
+  title: string;
+  description: string;
+  time: string;
+};
+
+// [] si le bot n'est pas joignable ou qu'aucune actualité n'a encore été
+// publiée — plus de fausses actus par défaut (voir décision du 22/07/2026).
+export async function getFamilyNews(limit?: number): Promise<NewsItem[]> {
+  const items = await getFamilyActualites(limit);
+  if (!items) return [];
+  return items.map((n) => ({
+    icon: n.icon,
+    title: n.title,
+    description: n.description,
+    time: formatRelativeTime(n.created_at),
+  }));
 }

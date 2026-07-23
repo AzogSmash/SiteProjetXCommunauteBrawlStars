@@ -120,6 +120,19 @@ export function getFamilySaisons() {
   return getJson<string[]>("/api/famille/saisons");
 }
 
+export type ApiNewsItem = {
+  id: number;
+  icon: "skull" | "shield" | "message" | "trophy";
+  title: string;
+  description: string;
+  author: string | null;
+  created_at: string;
+};
+
+export function getFamilyActualites(limit?: number) {
+  return getJson<ApiNewsItem[]>(`/api/famille/actualites${limit ? `?limit=${limit}` : ""}`);
+}
+
 export type ApiSeasonArchive = Record<
   string,
   { name: string; club: string | null; start: number; end: number; delta: number }
