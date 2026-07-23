@@ -59,6 +59,8 @@ const MODERATION_META: Record<ModerationAction, { label: string; icon: React.Com
   punition_fin: { label: "Fin de punition", icon: LockOpen, tone: "green" },
   morse: { label: "Punition morse", icon: Radio, tone: "primary" },
   morse_fin: { label: "Fin de punition morse", icon: LockOpen, tone: "green" },
+  casino_ban: { label: "Banni du casino", icon: Ban, tone: "red" },
+  casino_unban: { label: "Débanni du casino", icon: LockOpen, tone: "green" },
 };
 
 function ModerationRow({ entry }: { entry: ApiModerationEntry }) {

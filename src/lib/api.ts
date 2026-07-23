@@ -190,7 +190,17 @@ export function getDiscordMember(discordId: string) {
 // Panel staff (voir lib/access.ts) — arrivées récentes, journal d'audit de
 // modération, signalements. Même protection par secret partagé que
 // getDiscordMember.
-export type ModerationAction = "warn" | "mute" | "ban" | "silence" | "punition" | "punition_fin" | "morse" | "morse_fin";
+export type ModerationAction =
+  | "warn"
+  | "mute"
+  | "ban"
+  | "silence"
+  | "punition"
+  | "punition_fin"
+  | "morse"
+  | "morse_fin"
+  | "casino_ban"
+  | "casino_unban";
 
 export type ApiModerationEntry = {
   action: ModerationAction;
