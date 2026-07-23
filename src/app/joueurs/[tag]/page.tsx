@@ -8,7 +8,9 @@ import { RoleBadge } from "@/components/RoleBadge";
 import { TierIcon } from "@/components/TierIcon";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { DataUnavailable } from "@/components/DataUnavailable";
+import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { getPlayerProfile } from "@/lib/family";
+import { getAccessContext } from "@/lib/access";
 import { formatNumber } from "@/lib/format";
 
 export default async function PlayerProfilePage({
@@ -17,8 +19,10 @@ export default async function PlayerProfilePage({
   params: Promise<{ tag: string }>;
 }) {
   const { tag } = await params;
-  const profile = await getPlayerProfile(tag);
+  const [profile, access] = await Promise.all([getPlayerProfile(tag), getAccessContext()]);
   if (!profile) notFound();
+
+  const isOwner = access.bsTag != null && access.bsTag.replace(/^#/, "").toUpperCase() === profile.tag.replace(/^#/, "").toUpperCase();
 
   const hasLiveStats = profile.victories3v3 != null || profile.victoriesSolo != null || profile.victoriesDuo != null || profile.expLevel != null;
 
@@ -142,38 +146,46 @@ export default async function PlayerProfilePage({
           </Panel>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Panel title="Présentation">
-            {profile.bio ? (
-              <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground/90">
-                <MessageSquareText size={16} className="mt-0.5 shrink-0 text-primary-2" />
-                {profile.bio}
-              </p>
-            ) : (
-              <p className="py-4 text-center text-sm text-muted">
-                {`${profile.name} n'a pas encore écrit de présentation.`}
-              </p>
-            )}
-          </Panel>
+        {isOwner ? (
+          <div className="mt-6">
+            <Panel title="Modifier mon profil">
+              <ProfileEditForm tag={profile.tag} initialBio={profile.bio} screenshotUrl={profile.screenshotUrl} />
+            </Panel>
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Panel title="Présentation">
+              {profile.bio ? (
+                <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground/90">
+                  <MessageSquareText size={16} className="mt-0.5 shrink-0 text-primary-2" />
+                  {profile.bio}
+                </p>
+              ) : (
+                <p className="py-4 text-center text-sm text-muted">
+                  {`${profile.name} n'a pas encore écrit de présentation.`}
+                </p>
+              )}
+            </Panel>
 
-          <Panel title="Screenshot du profil">
-            {profile.screenshotUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- image hébergée sur Supabase Storage, domaine pas ajouté à next/image
-              <img
-                src={profile.screenshotUrl}
-                alt={`Profil in-game de ${profile.name}`}
-                className="w-full rounded-xl border border-border object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-2 text-muted">
-                  <ImageOff size={18} />
+            <Panel title="Screenshot du profil">
+              {profile.screenshotUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- image hébergée sur Supabase Storage, domaine pas ajouté à next/image
+                <img
+                  src={profile.screenshotUrl}
+                  alt={`Profil in-game de ${profile.name}`}
+                  className="w-full rounded-xl border border-border object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-2 py-8 text-center">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-2 text-muted">
+                    <ImageOff size={18} />
+                  </div>
+                  <p className="max-w-xs text-sm text-muted">Aucun screenshot ajouté pour l&apos;instant.</p>
                 </div>
-                <p className="max-w-xs text-sm text-muted">Aucun screenshot ajouté pour l&apos;instant.</p>
-              </div>
-            )}
-          </Panel>
-        </div>
+              )}
+            </Panel>
+          </div>
+        )}
       </main>
     </>
   );
