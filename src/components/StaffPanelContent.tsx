@@ -99,7 +99,7 @@ export async function StaffPanelContent() {
         </a>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatItem icon={Users} label="Clans suivis" value={String(clubRows.length)} sub="SAISON EN COURS" numeric />
         <StatItem
           icon={UserPlus}

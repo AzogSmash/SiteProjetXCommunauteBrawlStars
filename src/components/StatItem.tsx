@@ -22,10 +22,10 @@ export function StatItem({
       </div>
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</p>
-        <p className={`truncate text-xl text-foreground ${numeric ? "font-game" : "font-bold"}`}>
+        <p className={`line-clamp-2 break-words text-xl text-foreground ${numeric ? "font-game" : "font-bold"}`}>
           {value}
         </p>
-        <p className="text-xs font-medium text-primary-2">{sub}</p>
+        <p className="truncate text-xs font-medium text-primary-2">{sub}</p>
       </div>
     </div>
   );

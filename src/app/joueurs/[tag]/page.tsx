@@ -34,7 +34,7 @@ export default async function PlayerProfilePage({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="font-display text-2xl font-extrabold uppercase tracking-wide">{profile.name}</h2>
-              {profile.role && <RoleBadge role={profile.role} />}
+              {profile.role && <RoleBadge role={profile.role} tag={profile.tag} />}
               {profile.isAdmin ? (
                 <span className="flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-500">
                   <ShieldCheck size={12} /> Admin
@@ -72,7 +72,7 @@ export default async function PlayerProfilePage({
       </section>
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
-        <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatItem icon={Users} iconNode={<TrophyIcon size={26} />} label="Trophées" value={formatNumber(profile.trophies)} sub="TOTAL" numeric />
           <StatItem
             icon={Users}
@@ -102,7 +102,7 @@ export default async function PlayerProfilePage({
         <div className="mt-6">
           <Panel title="Victoires en jeu">
             {hasLiveStats ? (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <StatItem icon={Users} label="3v3" value={profile.victories3v3 != null ? formatNumber(profile.victories3v3) : "—"} sub="VICTOIRES" numeric />
                 <StatItem icon={Users} label="Solo" value={profile.victoriesSolo != null ? formatNumber(profile.victoriesSolo) : "—"} sub="VICTOIRES" numeric />
                 <StatItem icon={Users} label="Duo" value={profile.victoriesDuo != null ? formatNumber(profile.victoriesDuo) : "—"} sub="VICTOIRES" numeric />
@@ -116,7 +116,7 @@ export default async function PlayerProfilePage({
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Panel title="Ranked 1v1 (Discord)">
             {profile.duel1v1 ? (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <StatItem icon={Users} label="Points" value={String(profile.duel1v1.points)} sub={profile.duel1v1.tier} numeric />
                 <StatItem icon={Users} label="Victoires" value={String(profile.duel1v1.wins)} sub="1V1" numeric />
                 <StatItem icon={Users} label="Défaites" value={String(profile.duel1v1.losses)} sub="1V1" numeric />

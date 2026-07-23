@@ -100,7 +100,7 @@ export default async function PusheursPage() {
               {pushers.length === 0 && (
                 <DataUnavailable message="Pas encore de progression enregistrée cette saison." />
               )}
-              {pushers.map((player) => (
+              {pushers.slice(0, 20).map((player) => (
                 <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                   <span className="w-6 text-sm font-bold text-muted">{player.rank}</span>
                   <Avatar name={player.name} color={player.color} />
@@ -117,6 +117,11 @@ export default async function PusheursPage() {
                 </li>
               ))}
             </ul>
+            {pushers.length > 20 && (
+              <p className="mt-2 text-center text-xs text-muted">
+                Et {pushers.length - 20} autres — voir le classement complet ci-dessus.
+              </p>
+            )}
           </Panel>
         </div>
 

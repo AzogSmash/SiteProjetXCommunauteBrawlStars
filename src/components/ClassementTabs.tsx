@@ -55,6 +55,22 @@ function isTabId(value: string | undefined): value is TabId {
   return !!value && (TAB_IDS as string[]).includes(value);
 }
 
+// Nombre de lignes affichées avant "Voir plus" — évite d'imposer un scroll
+// interminable sur des classements de 150+ joueurs, surtout sur mobile.
+const PAGE_SIZE = 15;
+
+function ShowMoreButton({ remaining, onClick }: { remaining: number; onClick: () => void }) {
+  if (remaining <= 0) return null;
+  return (
+    <button
+      onClick={onClick}
+      className="mt-2 w-full rounded-xl border border-border py-2.5 text-xs font-semibold uppercase tracking-wide text-primary-2 transition-colors hover:bg-surface-2"
+    >
+      Voir plus ({remaining} de plus)
+    </button>
+  );
+}
+
 export function ClassementTabs({
   ranked,
   rankedAllTime,
@@ -71,6 +87,8 @@ export function ClassementTabs({
   initialTab?: string;
 }) {
   const [active, setActive] = useState<TabId>(isTabId(initialTab) ? initialTab : "ranked");
+  const [expandedTabs, setExpandedTabs] = useState<Set<TabId>>(new Set());
+  const expandTab = (id: TabId) => setExpandedTabs((prev) => new Set(prev).add(id));
 
   // Calcul direct au rendu (précision à l'heure près, pas à la seconde —
   // un désaccord d'hydratation serveur/client n'arriverait que si la
@@ -99,12 +117,12 @@ export function ClassementTabs({
         </div>
       </div>
 
-      <div className="mb-4 flex w-fit gap-1 rounded-full border border-border bg-surface p-1">
+      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActive(tab.id)}
-            className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+            className={`shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
               active === tab.id
                 ? "bg-gradient-to-r from-primary to-primary-2 text-white"
                 : "text-muted hover:text-foreground"
@@ -116,109 +134,134 @@ export function ClassementTabs({
       </div>
 
       {active === "ranked" && (
-        <ul className="flex flex-col gap-0.5">
-          {ranked.length === 0 && <DataUnavailable message="Classement ranked pas encore synchronisé." />}
-          {ranked.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-              <Rank rank={p.rank} />
-              <Avatar name={p.name} color={p.color} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
-                {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
-              </span>
-              <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
-              <TierIcon tier={p.tier} size={20} />
-              <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="flex flex-col gap-0.5">
+            {ranked.length === 0 && <DataUnavailable message="Classement ranked pas encore synchronisé." />}
+            {(expandedTabs.has("ranked") ? ranked : ranked.slice(0, PAGE_SIZE)).map((p) => (
+              <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={p.rank} />
+                <Avatar name={p.name} color={p.color} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                  <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+                  {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
+                </span>
+                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
+                <TierIcon tier={p.tier} size={20} />
+                <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
+              </li>
+            ))}
+          </ul>
+          {!expandedTabs.has("ranked") && (
+            <ShowMoreButton remaining={ranked.length - PAGE_SIZE} onClick={() => expandTab("ranked")} />
+          )}
+        </>
       )}
 
       {active === "ranked-all-time" && (
-        <ul className="flex flex-col gap-0.5">
-          {rankedAllTime.length === 0 && (
-            <DataUnavailable message="Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines heures." />
+        <>
+          <ul className="flex flex-col gap-0.5">
+            {rankedAllTime.length === 0 && (
+              <DataUnavailable message="Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines heures." />
+            )}
+            {(expandedTabs.has("ranked-all-time") ? rankedAllTime : rankedAllTime.slice(0, PAGE_SIZE)).map((p) => (
+              <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={p.rank} />
+                <Avatar name={p.name} color={p.color} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                  <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+                  {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
+                </span>
+                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
+                <TierIcon tier={p.tier} size={20} />
+                <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
+              </li>
+            ))}
+          </ul>
+          {!expandedTabs.has("ranked-all-time") && (
+            <ShowMoreButton remaining={rankedAllTime.length - PAGE_SIZE} onClick={() => expandTab("ranked-all-time")} />
           )}
-          {rankedAllTime.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-              <Rank rank={p.rank} />
-              <Avatar name={p.name} color={p.color} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
-                {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
-              </span>
-              <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
-              <TierIcon tier={p.tier} size={20} />
-              <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
-            </li>
-          ))}
-        </ul>
+        </>
       )}
 
       {active === "trophees" && (
-        <ul className="flex flex-col gap-0.5">
-          {trophees.length === 0 && <DataUnavailable message="Classement des trophées pas encore synchronisé." />}
-          {trophees.map((p) => (
-            <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-              <Rank rank={p.rank} />
-              <Avatar name={p.name} color={p.color} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
-                {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
-              </span>
-              <span className="flex w-24 items-center justify-end gap-1 text-right text-sm font-semibold text-foreground/90">
-                {p.trophies}
-                <TrophyIcon size={16} />
-              </span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="flex flex-col gap-0.5">
+            {trophees.length === 0 && <DataUnavailable message="Classement des trophées pas encore synchronisé." />}
+            {(expandedTabs.has("trophees") ? trophees : trophees.slice(0, PAGE_SIZE)).map((p) => (
+              <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={p.rank} />
+                <Avatar name={p.name} color={p.color} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                  <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+                  {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
+                </span>
+                <span className="flex w-24 items-center justify-end gap-1 text-right text-sm font-semibold text-foreground/90">
+                  {p.trophies}
+                  <TrophyIcon size={16} />
+                </span>
+              </li>
+            ))}
+          </ul>
+          {!expandedTabs.has("trophees") && (
+            <ShowMoreButton remaining={trophees.length - PAGE_SIZE} onClick={() => expandTab("trophees")} />
+          )}
+        </>
       )}
 
       {active === "1v1" && (
-        <ul className="flex flex-col gap-0.5">
-          {duel1v1.length === 0 && <DataUnavailable message="Aucun duel joué pour l'instant." />}
-          {duel1v1.map((p, i) => (
-            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-              <Rank rank={i + 1} />
-              <Avatar name={p.name} color={colorFromSeed(p.name)} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
-              </span>
-              <span className="hidden items-center gap-3 text-xs sm:flex">
-                <span className="flex items-center gap-1 font-semibold text-emerald-600">
-                  <Image src="/check.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
-                  {p.wins}
+        <>
+          <ul className="flex flex-col gap-0.5">
+            {duel1v1.length === 0 && <DataUnavailable message="Aucun duel joué pour l'instant." />}
+            {(expandedTabs.has("1v1") ? duel1v1 : duel1v1.slice(0, PAGE_SIZE)).map((p, i) => (
+              <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={i + 1} />
+                <Avatar name={p.name} color={colorFromSeed(p.name)} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                  <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-red-500">
-                  <Image src="/croix.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
-                  {p.losses}
+                <span className="hidden items-center gap-3 text-xs sm:flex">
+                  <span className="flex items-center gap-1 font-semibold text-emerald-600">
+                    <Image src="/check.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
+                    {p.wins}
+                  </span>
+                  <span className="flex items-center gap-1 font-semibold text-red-500">
+                    <Image src="/croix.png" alt="" width={14} height={15} style={{ width: 14, height: 15 }} />
+                    {p.losses}
+                  </span>
                 </span>
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wide text-primary-2">{p.tier}</span>
-              <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.points}</span>
-            </li>
-          ))}
-        </ul>
+                <span className="text-xs font-bold uppercase tracking-wide text-primary-2">{p.tier}</span>
+                <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.points}</span>
+              </li>
+            ))}
+          </ul>
+          {!expandedTabs.has("1v1") && (
+            <ShowMoreButton remaining={duel1v1.length - PAGE_SIZE} onClick={() => expandTab("1v1")} />
+          )}
+        </>
       )}
 
       {active === "casino" && (
-        <ul className="flex flex-col gap-0.5">
-          {casino.length === 0 && <DataUnavailable message="Personne n'a encore de jetons." />}
-          {casino.map((p, i) => (
-            <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-              <Rank rank={i + 1} />
-              <Avatar name={p.name} color={colorFromSeed(p.name)} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
-              </span>
-              <span className="flex items-center gap-1 text-sm font-semibold text-amber-600">
-                <Image src="/icons/coins.png" alt="" width={16} height={16} style={{ width: 16, height: 16 }} />
-                {formatNumber(p.coins)}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="flex flex-col gap-0.5">
+            {casino.length === 0 && <DataUnavailable message="Personne n'a encore de jetons." />}
+            {(expandedTabs.has("casino") ? casino : casino.slice(0, PAGE_SIZE)).map((p, i) => (
+              <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={i + 1} />
+                <Avatar name={p.name} color={colorFromSeed(p.name)} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
+                  <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
+                </span>
+                <span className="flex items-center gap-1 text-sm font-semibold text-amber-600">
+                  <Image src="/icons/coins.png" alt="" width={16} height={16} style={{ width: 16, height: 16 }} />
+                  {formatNumber(p.coins)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {!expandedTabs.has("casino") && (
+            <ShowMoreButton remaining={casino.length - PAGE_SIZE} onClick={() => expandTab("casino")} />
+          )}
+        </>
       )}
     </div>
   );

@@ -63,7 +63,7 @@ export function StatsBar({
           découpage sm:grid-cols-2 laissait le dernier tout seul sur sa
           ligne, mal aligné avec les traits de séparation (voir retour du
           21/07/2026 — "cases pas alignées"). */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {items.map((item) => (
           <StatItem key={item.label} {...item} />
         ))}

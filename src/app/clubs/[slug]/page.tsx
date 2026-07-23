@@ -68,7 +68,7 @@ export default async function ClubDetailPage({
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-6">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatItem icon={Users} iconNode={<TrophyIcon size={26} />} label="Trophées totaux" value={club.trophies} sub="CLUB" numeric />
           <StatItem icon={Users} label="Membres" value={String(club.memberCount)} sub="ACTIFS" numeric />
           <StatItem icon={Users} iconNode={<LockIcon size={24} />} label="Trophées requis" value={club.requiredTrophies || "—"} sub="MINIMUM" numeric />
@@ -92,7 +92,7 @@ export default async function ClubDetailPage({
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
                     <PlayerLink tag={member.tag}>{member.name}</PlayerLink>
                   </span>
-                  <RoleBadge role={member.role} />
+                  <RoleBadge role={member.role} tag={member.tag} />
                   <span className="w-24 text-right text-sm font-semibold text-foreground/90">
                     {member.trophies}
                   </span>
