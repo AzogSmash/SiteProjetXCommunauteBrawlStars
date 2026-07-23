@@ -3,7 +3,7 @@ import type { RankedPlayer } from "@/lib/family";
 import { Panel } from "./Panel";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
-import { tierColorClass } from "@/lib/tiers";
+import { tierColorClass, tierAbbreviation } from "@/lib/tiers";
 import { DataUnavailable } from "./DataUnavailable";
 import { PlayerLink } from "./PlayerLink";
 
@@ -38,7 +38,8 @@ export function EloRanking({ players }: { players: RankedPlayer[] }) {
                 <PlayerLink tag={player.tag}>{player.name}</PlayerLink>
               </span>
               <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(player.tier)}`}>
-                {player.tier}
+                <span className="hidden sm:inline">{player.tier}</span>
+                <span className="sm:hidden">{tierAbbreviation(player.tier)}</span>
               </span>
               <TierIcon tier={player.tier} size={20} />
               <span className="w-12 text-right text-sm font-semibold text-foreground/90">
