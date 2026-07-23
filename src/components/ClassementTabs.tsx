@@ -99,18 +99,18 @@ export function ClassementTabs({
 
   return (
     <div className="card-elevated relative rounded-2xl border border-border bg-surface p-5">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">Classements</h2>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {seasonLabel && (
-            <span className="card-elevated relative -top-8 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/25 bg-surface px-3 py-1 text-[11px] font-semibold text-primary-2">
+            <span className="card-elevated relative flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/25 bg-surface px-3 py-1 text-[11px] font-semibold text-primary-2 sm:-top-8">
               <SeasonClock size={13} />
               {seasonLabel}
             </span>
           )}
           <Link
             href="/clubs"
-            className="text-xs font-semibold uppercase tracking-wide text-primary-2 hover:text-primary"
+            className="shrink-0 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-primary-2 hover:text-primary"
           >
             Voir les clubs
           </Link>

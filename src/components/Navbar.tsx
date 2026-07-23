@@ -53,9 +53,9 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
             <Link
               href={profileHref}
               aria-label="Mon profil"
-              className="hidden items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-2 text-sm font-medium text-muted transition-colors hover:border-primary/60 hover:text-foreground sm:flex"
+              className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/60 hover:text-primary-2 sm:flex"
             >
-              <CircleUserRound size={17} />
+              <CircleUserRound size={19} />
               Mon profil
             </Link>
           )}

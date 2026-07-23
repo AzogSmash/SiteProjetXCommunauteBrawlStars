@@ -122,7 +122,7 @@ export default async function PlayerProfilePage({
                 <StatItem icon={Users} label="Défaites" value={String(profile.duel1v1.losses)} sub="1V1" numeric />
               </div>
             ) : profile.discordLinked ? (
-              <DataUnavailable message="Aucun duel joué pour l'instant." />
+              <DataUnavailable message="Aucun duel joué pour l'instant." showContact={false} />
             ) : (
               <DataUnavailable message="Compte Discord non lié — ces stats nécessitent une liaison BS ↔ Discord." />
             )}
@@ -135,7 +135,7 @@ export default async function PlayerProfilePage({
                 <span className="text-sm text-muted">jetons</span>
               </div>
             ) : profile.discordLinked ? (
-              <DataUnavailable message="Personne n'a encore de jetons." />
+              <DataUnavailable message="Ce joueur n'a pas encore de jetons." showContact={false} />
             ) : (
               <DataUnavailable message="Compte Discord non lié — ces stats nécessitent une liaison BS ↔ Discord." />
             )}
@@ -150,8 +150,8 @@ export default async function PlayerProfilePage({
                 {profile.bio}
               </p>
             ) : (
-              <p className="text-sm text-muted">
-                {profile.name} n&apos;a pas encore écrit de présentation.
+              <p className="py-4 text-center text-sm text-muted">
+                {`${profile.name} n'a pas encore écrit de présentation.`}
               </p>
             )}
           </Panel>
