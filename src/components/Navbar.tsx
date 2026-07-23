@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, CircleUserRound, Menu, X } from "lucide-react";
+import { CircleUserRound, Menu, X } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import { LogoWordmark } from "./Logo";
 import { AuthButton } from "./AuthButton";
+import { SearchBar } from "./SearchBar";
 
 export function Navbar({ bsTag }: { bsTag: string | null }) {
   const pathname = usePathname();
@@ -41,14 +42,7 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm text-muted md:flex">
-            <Search size={16} />
-            <input
-              type="text"
-              placeholder="Rechercher un joueur, un club..."
-              className="w-48 bg-transparent placeholder:text-muted focus:outline-none xl:w-64"
-            />
-          </div>
+          <SearchBar className="hidden w-48 md:block xl:w-64" />
           {profileHref && (
             <Link
               href={profileHref}
@@ -73,14 +67,7 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
 
       {mobileOpen && (
         <nav className="border-t border-border px-6 py-3 lg:hidden">
-          <div className="mb-2 flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm text-muted md:hidden">
-            <Search size={16} />
-            <input
-              type="text"
-              placeholder="Rechercher un joueur, un club..."
-              className="w-full bg-transparent placeholder:text-muted focus:outline-none"
-            />
-          </div>
+          <SearchBar className="mb-2 w-full md:hidden" />
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link) => {
               const active =
