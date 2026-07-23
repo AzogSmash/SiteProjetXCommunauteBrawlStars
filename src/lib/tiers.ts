@@ -16,12 +16,38 @@ export function tierColorClass(tier: string): string {
 }
 
 const TIER_FAMILIES = ["bronze", "argent", "or", "diamant", "mythique", "legendaire", "masters"];
+
+const FAMILY_ABBR: Record<string, string> = {
+  bronze: "B",
+  argent: "A",
+  or: "O",
+  diamant: "D",
+  mythique: "My",
+  legendaire: "L",
+  masters: "Ma",
+};
+
 // Les fichiers d'icônes gardent l'ancien nom "legende" (pas besoin de
 // renommer les assets pour un simple changement de libellé affiché).
 const FAMILY_ICON_FILE: Record<string, string> = { legendaire: "legende" };
 
 function stripAccents(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+// Version compacte pour l'affichage mobile ("L1" au lieu de "Légendaire 1")
+// — l'icône du palier (voir tierIconPath) et la couleur (voir tierColorClass)
+// suffisent à identifier lequel c'est, pas besoin du nom complet sur petit écran.
+export function tierAbbreviation(tier: string): string {
+  const t = stripAccents(tier.toLowerCase()).trim();
+  if (t.startsWith("pro")) return "Pro";
+  const match = t.match(/^([a-z]+)\s*(\d+)/);
+  const family = match?.[1];
+  const number = match?.[2];
+  if (family && number && TIER_FAMILIES.includes(family)) {
+    return `${FAMILY_ABBR[family]}${number}`;
+  }
+  return tier;
 }
 
 // Icônes officielles du ranked BS (mêmes assets que le bot Discord), voir

@@ -8,7 +8,7 @@ import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
 import { SeasonClock } from "./SeasonClock";
-import { tierColorClass } from "@/lib/tiers";
+import { tierColorClass, tierAbbreviation } from "@/lib/tiers";
 import { colorFromSeed, formatNumber } from "@/lib/format";
 import { formatSeasonEndLabel, type SeasonCategory } from "@/lib/seasonReset";
 import type { RankedPlayer, Player } from "@/lib/family";
@@ -145,7 +145,10 @@ export function ClassementTabs({
                   <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                   {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
                 </span>
-                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
+                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>
+                  <span className="hidden sm:inline">{p.tier}</span>
+                  <span className="sm:hidden">{tierAbbreviation(p.tier)}</span>
+                </span>
                 <TierIcon tier={p.tier} size={20} />
                 <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
               </li>
@@ -171,7 +174,10 @@ export function ClassementTabs({
                   <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
                   {p.club && <span className="ml-2 text-xs font-normal text-muted">{p.club}</span>}
                 </span>
-                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>{p.tier}</span>
+                <span className={`text-xs font-bold uppercase tracking-wide ${tierColorClass(p.tier)}`}>
+                  <span className="hidden sm:inline">{p.tier}</span>
+                  <span className="sm:hidden">{tierAbbreviation(p.tier)}</span>
+                </span>
                 <TierIcon tier={p.tier} size={20} />
                 <span className="w-12 text-right text-sm font-semibold text-foreground/90">{p.elo}</span>
               </li>
