@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Users, ChevronRight, ShieldCheck, ImageOff, MessageSquareText } from "lucide-react";
+import { Users, ChevronRight, ShieldCheck, ImageOff, MessageSquareText, Link2, Unlink } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
@@ -44,6 +44,15 @@ export default async function PlayerProfilePage({
                   <ShieldCheck size={12} /> Staff
                 </span>
               ) : null}
+              {profile.discordLinked ? (
+                <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
+                  <Link2 size={12} /> Discord lié
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
+                  <Unlink size={12} /> Discord non lié
+                </span>
+              )}
             </div>
             {profile.club && (
               profile.clubSlug ? (

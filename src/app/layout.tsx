@@ -56,7 +56,7 @@ export default async function RootLayout({
             motif couvre aussi l'espace sous le footer si jamais le contenu
             est plus court que le viewport. */}
         {!botReachable && <DemoDataBanner />}
-        <Navbar />
+        <Navbar bsTag={access.bsTag} />
         {children}
         <Footer />
         <BsLinkModal shouldShow={shouldShowBsLinkPrompt} />

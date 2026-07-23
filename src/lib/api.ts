@@ -171,7 +171,7 @@ export function getFamilyClassementCasino() {
 // — pilote les niveaux d'accès du site, voir lib/access.ts. `null` veut dire
 // soit l'API est injoignable, soit cet ID n'est pas (plus) membre du serveur
 // Discord — les deux cas se traitent pareil ici (retombe sur "invité").
-export type ApiDiscordMember = { role_ids: string[]; is_admin: boolean; bs_linked: boolean };
+export type ApiDiscordMember = { role_ids: string[]; is_admin: boolean; bs_linked: boolean; bs_tag: string | null };
 
 function internalHeaders(): Record<string, string> | undefined {
   const secret = process.env.INTERNAL_API_SECRET;

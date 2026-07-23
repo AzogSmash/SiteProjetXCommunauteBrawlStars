@@ -1,27 +1,28 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, CircleUserRound } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import { LogoWordmark } from "./Logo";
 import { AuthButton } from "./AuthButton";
 
-export function Navbar() {
+export function Navbar({ bsTag }: { bsTag: string | null }) {
   const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center gap-8 px-6 py-4">
-        <a href="/" className="shrink-0">
+        <Link href="/" className="shrink-0">
           <LogoWordmark />
-        </a>
+        </Link>
 
         <nav className="hidden flex-1 items-center gap-8 lg:flex">
           {navLinks.map((link) => {
             const active =
               link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className={
@@ -31,7 +32,7 @@ export function Navbar() {
                 }
               >
                 {link.label}
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -45,6 +46,16 @@ export function Navbar() {
               className="w-48 bg-transparent placeholder:text-muted focus:outline-none xl:w-64"
             />
           </div>
+          {bsTag && (
+            <Link
+              href={`/joueurs/${encodeURIComponent(bsTag.replace(/^#/, ""))}`}
+              aria-label="Mon profil"
+              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-2 text-sm font-medium text-muted transition-colors hover:border-primary/60 hover:text-foreground"
+            >
+              <CircleUserRound size={17} />
+              <span className="hidden sm:inline">Mon profil</span>
+            </Link>
+          )}
           <AuthButton />
         </div>
       </div>
