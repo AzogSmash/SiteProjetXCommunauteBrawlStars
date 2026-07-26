@@ -93,7 +93,7 @@ export default async function ClubDetailPage({
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
                     <PlayerLink tag={member.tag}>{member.name}</PlayerLink>
                   </span>
-                  <RoleBadge role={member.role} tag={member.tag} />
+                  <RoleBadge role={member.role} tag={member.tag} className="hidden sm:inline-flex" />
                   <span className="w-24 text-right text-sm font-semibold text-foreground/90">
                     {member.trophies}
                   </span>

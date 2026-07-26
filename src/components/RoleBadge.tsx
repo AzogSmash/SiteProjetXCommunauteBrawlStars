@@ -28,12 +28,12 @@ const FEMININE_TAGS = new Set([
   "9QVUYLVP8", // Clochette, présidente de Projet Y
 ]);
 
-export function RoleBadge({ role, tag }: { role: ApiClubRole; tag?: string }) {
+export function RoleBadge({ role, tag, className = "" }: { role: ApiClubRole; tag?: string; className?: string }) {
   const clean = tag?.replace(/^#/, "").toUpperCase();
   const label = clean && FEMININE_TAGS.has(clean) ? roleLabelsFeminine[role] : roleLabels[role];
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${roleStyles[role]}`}
+      className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${roleStyles[role]} ${className}`}
     >
       {label}
     </span>

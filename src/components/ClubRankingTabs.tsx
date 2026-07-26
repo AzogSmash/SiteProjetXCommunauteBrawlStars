@@ -38,26 +38,22 @@ function Rank({ rank }: { rank: number }) {
 // à un compte lié) — pour ranked/trophées, les données viennent du tag BS
 // directement, un membre manquant veut dire "pas encore synchronisé", pas
 // "compte pas lié". Deux messages différents pour ne pas raconter n'importe quoi.
-function UnresolvedSection({
-  unresolved,
-  needsLink,
+function UnresolvedGroup({
+  title,
+  message,
+  members,
 }: {
-  unresolved: { tag: string; name: string; color: string }[];
-  needsLink: boolean;
+  title: string;
+  message: string;
+  members: { tag: string; name: string; color: string }[];
 }) {
-  if (unresolved.length === 0) return null;
+  if (members.length === 0) return null;
   return (
-    <div className="mt-3 border-t border-border pt-3">
-      <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted">
-        Classement indéterminé
-      </p>
-      <p className="mb-2 px-3 text-xs text-muted">
-        {needsLink
-          ? "Connecte-toi sur le site avec Discord et lie ton compte Brawl Stars à ton profil Projet X pour apparaître ici."
-          : "Pas encore de données pour ces membres."}
-      </p>
+    <div className="mt-3 border-t border-border pt-3 first:mt-0 first:border-t-0 first:pt-0">
+      <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted">{title}</p>
+      <p className="mb-2 px-3 text-xs text-muted">{message}</p>
       <ul className="flex flex-col gap-0.5">
-        {unresolved.map((m) => (
+        {members.map((m) => (
           <li key={m.tag} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
             <span className="w-5 text-sm font-bold text-muted">—</span>
             <Avatar name={m.name} color={m.color} />
@@ -68,6 +64,45 @@ function UnresolvedSection({
         ))}
       </ul>
     </div>
+  );
+}
+
+// Pour 1v1/casino, "absent de la catégorie" a deux causes bien différentes
+// qui ne doivent pas être confondues : compte pas lié DU TOUT (message
+// "lie ton compte"), ou compte lié mais qui n'a simplement jamais joué à ce
+// mode précis (`linked: true`, calculé côté family.ts en croisant 1v1 et
+// casino — un membre visible dans l'un des deux est forcément lié). Pour
+// ranked/trophées (needsLink=false), pas de distinction : "linked" n'est
+// jamais renseigné, tout le monde tombe dans un seul groupe "pas encore
+// synchronisé".
+function UnresolvedSection({
+  unresolved,
+  needsLink,
+}: {
+  unresolved: { tag: string; name: string; color: string; linked?: boolean }[];
+  needsLink: boolean;
+}) {
+  if (unresolved.length === 0) return null;
+  if (!needsLink) {
+    return (
+      <UnresolvedGroup title="Classement indéterminé" message="Pas encore de données pour ces membres." members={unresolved} />
+    );
+  }
+  const linked = unresolved.filter((m) => m.linked);
+  const notLinked = unresolved.filter((m) => !m.linked);
+  return (
+    <>
+      <UnresolvedGroup
+        title="Pas encore joué"
+        message="Compte bien lié, mais aucun score enregistré dans cette catégorie pour l'instant."
+        members={linked}
+      />
+      <UnresolvedGroup
+        title="Classement indéterminé"
+        message="Connecte-toi sur le site avec Discord et lie ton compte Brawl Stars à ton profil Projet X pour apparaître ici."
+        members={notLinked}
+      />
+    </>
   );
 }
 

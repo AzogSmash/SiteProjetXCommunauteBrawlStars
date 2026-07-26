@@ -280,7 +280,13 @@ export type ClubDetail = {
 
 const normTag = (t: string) => t.replace(/^#/, "").toUpperCase();
 
-export type ClubCategory<T> = { entries: T[]; unresolved: { tag: string; name: string; color: string }[] };
+// `linked` n'est renseigné que pour 1v1/casino (voir withLinkInfo) — ranked/
+// trophées n'en ont pas besoin, "absent" y veut dire "pas encore synchronisé"
+// dans tous les cas, jamais "compte pas lié".
+export type ClubCategory<T> = {
+  entries: T[];
+  unresolved: { tag: string; name: string; color: string; linked?: boolean }[];
+};
 
 const EMPTY_RANKING: ClubRanking = {
   ranked: { entries: [], unresolved: [] },
@@ -321,6 +327,20 @@ function splitByRoster<T extends { tag?: string | null }>(
     .filter((m) => !matchedTags.has(normTag(m.tag)))
     .map((m) => ({ tag: m.tag, name: m.name, color: m.color }));
   return { entries: matched, unresolved };
+}
+
+// 1v1 et casino sont TOUS LES DEUX conditionnés au même "compte Discord lié"
+// (voir _bs_accounts côté bot) — si un membre a un score dans l'un des deux,
+// c'est la preuve que son compte est lié, même s'il n'a simplement jamais
+// joué à l'autre. Sans ça, un membre visible en 1v1 pouvait quand même se
+// voir dire "lie ton compte" dans l'onglet casino, ce qui n'a aucun sens
+// (repéré le 26/07/2026 : "comment des membres apparaissent dans le
+// classement 1v1 [...] mais pas dans casino ? c'est pas logique").
+function withLinkInfo<T>(category: ClubCategory<T>, linkedTags: Set<string>): ClubCategory<T> {
+  return {
+    entries: category.entries,
+    unresolved: category.unresolved.map((m) => ({ ...m, linked: linkedTags.has(normTag(m.tag)) })),
+  };
 }
 
 export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
@@ -366,11 +386,18 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
       color: colorFromSeed(m.tag),
     }));
 
+  const duel1v1Split = splitByRoster(duel1v1 ?? [], roster);
+  const casinoSplit = splitByRoster(casino ?? [], roster);
+  const linkedTags = new Set([
+    ...duel1v1Split.entries.map((e) => normTag(e.tag!)),
+    ...casinoSplit.entries.map((e) => normTag(e.tag!)),
+  ]);
+
   const ranking: ClubRanking = {
     ranked: splitByRoster(ranked, roster),
     rankedAllTime: splitByRoster(rankedAllTime, roster),
-    duel1v1: splitByRoster(duel1v1 ?? [], roster),
-    casino: splitByRoster(casino ?? [], roster),
+    duel1v1: withLinkInfo(duel1v1Split, linkedTags),
+    casino: withLinkInfo(casinoSplit, linkedTags),
   };
 
   return {
