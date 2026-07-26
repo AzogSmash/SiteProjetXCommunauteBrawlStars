@@ -201,7 +201,7 @@ export type CommunityStats = {
   bestElo: number | null;
   bestEloTier: string | null;
   clubCount: number;
-  topPusher: { name: string; trophies: string } | null;
+  topPusher: { name: string; trophies: string; tag: string | null } | null;
 };
 
 // null si le bot n'a pas encore synchronisé clans/trophées — chaque champ
@@ -229,10 +229,10 @@ export async function getCommunityStats(): Promise<CommunityStats | null> {
 
   // "Meilleur pusher" = plus grosse progression de trophées cette saison
   // (même donnée que !evo), pas le plus gros total de trophées.
-  let topPusher: { name: string; trophies: string } | null = null;
+  let topPusher: { name: string; trophies: string; tag: string | null } | null = null;
   if (evolution && evolution.players.length > 0) {
     const top = evolution.players.slice().sort((a, b) => b.delta - a.delta)[0];
-    topPusher = { name: top.name, trophies: `${top.delta >= 0 ? "+" : ""}${formatNumber(top.delta)}` };
+    topPusher = { name: top.name, trophies: `${top.delta >= 0 ? "+" : ""}${formatNumber(top.delta)}`, tag: top.tag };
   }
 
   return {

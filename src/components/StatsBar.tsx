@@ -4,6 +4,7 @@ import { TierIcon } from "./TierIcon";
 import { TrophyIcon } from "./TrophyIcon";
 import { MembersIcon } from "./MembersIcon";
 import { SeasonClock } from "./SeasonClock";
+import { PlayerLink } from "./PlayerLink";
 import type { CommunityStats } from "@/lib/family";
 
 const NOT_SYNCED = "Pas encore synchronisé";
@@ -45,7 +46,11 @@ export function StatsBar({
     {
       icon: TrendingUp,
       label: "Meilleur pusher",
-      value: stats?.topPusher?.name ?? "—",
+      value: stats?.topPusher ? (
+        <PlayerLink tag={stats.topPusher.tag}>{stats.topPusher.name}</PlayerLink>
+      ) : (
+        "—"
+      ),
       sub: stats?.topPusher ? `${stats.topPusher.trophies} 🏆` : NOT_SYNCED,
     },
     {

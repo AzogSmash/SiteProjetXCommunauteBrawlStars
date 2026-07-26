@@ -2,11 +2,10 @@ import Image from "next/image";
 import { Crown } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
-import { Avatar } from "@/components/Avatar";
 import { PushArrow } from "@/components/PushArrow";
 import { SeasonClock } from "@/components/SeasonClock";
 import { DataUnavailable } from "@/components/DataUnavailable";
-import { PlayerLink } from "@/components/PlayerLink";
+import { TopPushersList } from "@/components/TopPushersList";
 import {
   getCurrentSeasonProgress,
   getSeasonHistory,
@@ -96,32 +95,7 @@ export default async function PusheursPage() {
             linkLabel="Voir le classement complet"
             linkHref="/classement"
           >
-            <ul className="flex flex-col gap-0.5">
-              {pushers.length === 0 && (
-                <DataUnavailable message="Pas encore de progression enregistrée cette saison." />
-              )}
-              {pushers.slice(0, 20).map((player) => (
-                <li key={player.tag ?? player.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-                  <span className="w-6 text-sm font-bold text-muted">{player.rank}</span>
-                  <Avatar name={player.name} color={player.color} />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
-                    <PlayerLink tag={player.tag}>{player.name}</PlayerLink>
-                    {player.club && (
-                      <span className="ml-2 text-xs font-normal text-muted">{player.club}</span>
-                    )}
-                  </span>
-                  <span className="flex items-center gap-1 text-sm font-semibold text-primary-2">
-                    {player.trophies}
-                    <PushArrow value={player.trophies} size={16} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {pushers.length > 20 && (
-              <p className="mt-2 text-center text-xs text-muted">
-                Et {pushers.length - 20} autres — voir le classement complet ci-dessus.
-              </p>
-            )}
+            <TopPushersList pushers={pushers} />
           </Panel>
         </div>
 

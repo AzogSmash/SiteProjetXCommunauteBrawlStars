@@ -9,7 +9,7 @@ export function StatItem({
   icon: React.ComponentType<{ size?: number; className?: string }>;
   iconNode?: React.ReactNode;
   label: string;
-  value: string;
+  value: React.ReactNode;
   sub: string;
   // Police du jeu (Lilita One) pour les valeurs chiffrées (trophées, élo...) —
   // pas pour du texte libre (nom de joueur, type de club...), où elle jurerait.
