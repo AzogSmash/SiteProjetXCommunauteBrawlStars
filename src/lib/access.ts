@@ -15,6 +15,7 @@ export type AccessContext = {
   clubSlug: string | null;
   bsLinked: boolean;
   bsTag: string | null;
+  discordId: string | null;
 };
 
 const GUEST_ROLE_ID = "1513110804583547047";
@@ -33,7 +34,7 @@ const CLUB_ROLE_SLUGS: Record<string, string> = {
   "1528835091718213743": "projet", // Projet Ψ
 };
 
-const ANONYMOUS: AccessContext = { loggedIn: false, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false, bsTag: null };
+const ANONYMOUS: AccessContext = { loggedIn: false, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false, bsTag: null, discordId: null };
 
 // Server-only : lit la session Supabase (cookies) puis résout le rôle Discord
 // réel depuis le miroir tenu par le bot (jamais via un scope OAuth guilds —
@@ -46,11 +47,11 @@ export async function getAccessContext(): Promise<AccessContext> {
   } = await supabase.auth.getUser();
   if (!user) return ANONYMOUS;
 
-  const discordId = user.identities?.find((i) => i.provider === "discord")?.id;
+  const discordId = user.identities?.find((i) => i.provider === "discord")?.id ?? null;
   if (!discordId) return { ...ANONYMOUS, loggedIn: true };
 
   const member = await getDiscordMember(discordId);
-  if (!member) return { loggedIn: true, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false, bsTag: null };
+  if (!member) return { loggedIn: true, inGuild: false, tier: "invite", clubSlug: null, bsLinked: false, bsTag: null, discordId };
 
   const clubSlug =
     Object.entries(CLUB_ROLE_SLUGS).find(([roleId]) => member.role_ids.includes(roleId))?.[1] ?? null;
@@ -64,7 +65,7 @@ export async function getAccessContext(): Promise<AccessContext> {
     tier = "membre";
   }
 
-  return { loggedIn: true, inGuild: true, tier, clubSlug, bsLinked: member.bs_linked, bsTag: member.bs_tag };
+  return { loggedIn: true, inGuild: true, tier, clubSlug, bsLinked: member.bs_linked, bsTag: member.bs_tag, discordId };
 }
 
 // Badge staff/admin pour un ID Discord donné (pas forcément la personne

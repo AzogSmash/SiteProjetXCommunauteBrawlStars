@@ -1,5 +1,5 @@
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-surface-2 ${className}`} />;
+  return <div className={`skeleton-shimmer rounded-lg ${className}`} />;
 }
 
 // Ligne générique (avatar + nom + valeur) — utilisée par les loading.tsx des

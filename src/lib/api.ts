@@ -234,3 +234,27 @@ export type ApiStaffPanel = {
 export function getStaffPanel() {
   return getJson<ApiStaffPanel>("/api/staff/panel", { headers: internalHeaders() });
 }
+
+// Transcript d'un ticket fermé (voir /staff/tickets/[id]) — même protection
+// par secret partagé que getStaffPanel.
+export type ApiTicketMessage = { author: string; avatar_url: string | null; content: string; created_at: string };
+
+export type ApiTicket = {
+  id: number;
+  discord_id: string;
+  bs_tag: string | null;
+  category: string;
+  description: string;
+  channel_id: string;
+  status: "open" | "closed";
+  claimed_by: string | null;
+  closed_by: string | null;
+  close_reason: string | null;
+  transcript: ApiTicketMessage[] | null;
+  created_at: string;
+  closed_at: string | null;
+};
+
+export function getTicket(id: string) {
+  return getJson<ApiTicket>(`/api/tickets/${encodeURIComponent(id)}`, { headers: internalHeaders() });
+}

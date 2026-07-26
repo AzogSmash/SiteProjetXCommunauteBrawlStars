@@ -73,3 +73,32 @@ body {
   pointer-events: none;
   z-index: 0;
 }
+
+/* Skeletons de chargement : reflet dégradé qui traverse le bloc plutôt qu'un
+   simple fondu d'opacité (animate-pulse), plus lisible comme "en cours de
+   chargement" qu'un pulse plat. */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(169, 112, 255, 0.16),
+    transparent
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
+}

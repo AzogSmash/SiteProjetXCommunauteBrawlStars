@@ -4,6 +4,7 @@ export const navLinks = [
   { label: "Classement", href: "/classement" },
   { label: "Pusheurs", href: "/pusheurs" },
   { label: "Actualités", href: "/actualites" },
+  { label: "Support", href: "/support" },
 ];
 
 export const communityDescription =
