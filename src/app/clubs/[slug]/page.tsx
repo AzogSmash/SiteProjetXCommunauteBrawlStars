@@ -9,6 +9,7 @@ import { StatItem } from "@/components/StatItem";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { LockIcon } from "@/components/LockIcon";
 import { PlayerLink } from "@/components/PlayerLink";
+import { ClubRankingTabs } from "@/components/ClubRankingTabs";
 import { getClubDetail } from "@/lib/family";
 import { discordInviteUrl } from "@/lib/data";
 
@@ -102,6 +103,10 @@ export default async function ClubDetailPage({
             </ul>
           )}
         </Panel>
+
+        <div className="mt-8">
+          <ClubRankingTabs ranking={club.ranking} />
+        </div>
       </main>
     </>
   );

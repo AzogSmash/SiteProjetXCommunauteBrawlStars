@@ -71,24 +71,41 @@ function ShowMoreButton({ remaining, onClick }: { remaining: number; onClick: ()
   );
 }
 
+type ClubFilterable = { club?: string | null };
+type DuelRow = Api1v1Player & { rank: number; club: string | null };
+type CasinoRow = ApiCasinoPlayer & { rank: number; club: string | null };
+
+function byClub<T extends ClubFilterable>(list: T[], club: string | null): T[] {
+  return club ? list.filter((p) => p.club === club) : list;
+}
+
 export function ClassementTabs({
   ranked,
   rankedAllTime,
   trophees,
   duel1v1,
   casino,
+  clubs,
   initialTab,
 }: {
   ranked: RankedPlayer[];
   rankedAllTime: RankedPlayer[];
   trophees: Player[];
-  duel1v1: Api1v1Player[];
-  casino: ApiCasinoPlayer[];
+  duel1v1: DuelRow[];
+  casino: CasinoRow[];
+  clubs: { value: string; label: string }[];
   initialTab?: string;
 }) {
   const [active, setActive] = useState<TabId>(isTabId(initialTab) ? initialTab : "ranked");
   const [expandedTabs, setExpandedTabs] = useState<Set<TabId>>(new Set());
   const expandTab = (id: TabId) => setExpandedTabs((prev) => new Set(prev).add(id));
+  const [clubFilter, setClubFilter] = useState<string | null>(null);
+
+  const rankedFiltered = byClub(ranked, clubFilter);
+  const rankedAllTimeFiltered = byClub(rankedAllTime, clubFilter);
+  const tropheesFiltered = byClub(trophees, clubFilter);
+  const duel1v1Filtered = byClub(duel1v1, clubFilter);
+  const casinoFiltered = byClub(casino, clubFilter);
 
   // Calcul direct au rendu (précision à l'heure près, pas à la seconde —
   // un désaccord d'hydratation serveur/client n'arriverait que si la
@@ -117,27 +134,48 @@ export function ClassementTabs({
         </div>
       </div>
 
-      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActive(tab.id)}
-            className={`shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-              active === tab.id
-                ? "bg-gradient-to-r from-primary to-primary-2 text-white"
-                : "text-muted hover:text-foreground"
-            }`}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActive(tab.id)}
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                active === tab.id
+                  ? "bg-gradient-to-r from-primary to-primary-2 text-white"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {clubs.length > 0 && (
+          <select
+            value={clubFilter ?? ""}
+            onChange={(e) => setClubFilter(e.target.value || null)}
+            className="shrink-0 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground outline-none focus:border-primary/50"
           >
-            {tab.label}
-          </button>
-        ))}
+            <option value="">Tous les clubs</option>
+            {clubs.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {active === "ranked" && (
         <>
           <ul className="flex flex-col gap-0.5">
-            {ranked.length === 0 && <DataUnavailable message="Classement ranked pas encore synchronisé." />}
-            {(expandedTabs.has("ranked") ? ranked : ranked.slice(0, PAGE_SIZE)).map((p) => (
+            {rankedFiltered.length === 0 && (
+              <DataUnavailable
+                message={clubFilter ? "Aucun joueur de ce club dans ce classement." : "Classement ranked pas encore synchronisé."}
+                showContact={!clubFilter}
+              />
+            )}
+            {(expandedTabs.has("ranked") ? rankedFiltered : rankedFiltered.slice(0, PAGE_SIZE)).map((p) => (
               <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                 <Rank rank={p.rank} />
                 <Avatar name={p.name} color={p.color} />
@@ -155,7 +193,7 @@ export function ClassementTabs({
             ))}
           </ul>
           {!expandedTabs.has("ranked") && (
-            <ShowMoreButton remaining={ranked.length - PAGE_SIZE} onClick={() => expandTab("ranked")} />
+            <ShowMoreButton remaining={rankedFiltered.length - PAGE_SIZE} onClick={() => expandTab("ranked")} />
           )}
         </>
       )}
@@ -163,10 +201,17 @@ export function ClassementTabs({
       {active === "ranked-all-time" && (
         <>
           <ul className="flex flex-col gap-0.5">
-            {rankedAllTime.length === 0 && (
-              <DataUnavailable message="Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines heures." />
+            {rankedAllTimeFiltered.length === 0 && (
+              <DataUnavailable
+                message={
+                  clubFilter
+                    ? "Aucun joueur de ce club dans ce classement."
+                    : "Pas encore de records synchronisés — ça arrive automatiquement au fil des prochaines heures."
+                }
+                showContact={!clubFilter}
+              />
             )}
-            {(expandedTabs.has("ranked-all-time") ? rankedAllTime : rankedAllTime.slice(0, PAGE_SIZE)).map((p) => (
+            {(expandedTabs.has("ranked-all-time") ? rankedAllTimeFiltered : rankedAllTimeFiltered.slice(0, PAGE_SIZE)).map((p) => (
               <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                 <Rank rank={p.rank} />
                 <Avatar name={p.name} color={p.color} />
@@ -184,7 +229,7 @@ export function ClassementTabs({
             ))}
           </ul>
           {!expandedTabs.has("ranked-all-time") && (
-            <ShowMoreButton remaining={rankedAllTime.length - PAGE_SIZE} onClick={() => expandTab("ranked-all-time")} />
+            <ShowMoreButton remaining={rankedAllTimeFiltered.length - PAGE_SIZE} onClick={() => expandTab("ranked-all-time")} />
           )}
         </>
       )}
@@ -192,8 +237,13 @@ export function ClassementTabs({
       {active === "trophees" && (
         <>
           <ul className="flex flex-col gap-0.5">
-            {trophees.length === 0 && <DataUnavailable message="Classement des trophées pas encore synchronisé." />}
-            {(expandedTabs.has("trophees") ? trophees : trophees.slice(0, PAGE_SIZE)).map((p) => (
+            {tropheesFiltered.length === 0 && (
+              <DataUnavailable
+                message={clubFilter ? "Aucun joueur de ce club dans ce classement." : "Classement des trophées pas encore synchronisé."}
+                showContact={!clubFilter}
+              />
+            )}
+            {(expandedTabs.has("trophees") ? tropheesFiltered : tropheesFiltered.slice(0, PAGE_SIZE)).map((p) => (
               <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
                 <Rank rank={p.rank} />
                 <Avatar name={p.name} color={p.color} />
@@ -209,7 +259,7 @@ export function ClassementTabs({
             ))}
           </ul>
           {!expandedTabs.has("trophees") && (
-            <ShowMoreButton remaining={trophees.length - PAGE_SIZE} onClick={() => expandTab("trophees")} />
+            <ShowMoreButton remaining={tropheesFiltered.length - PAGE_SIZE} onClick={() => expandTab("trophees")} />
           )}
         </>
       )}
@@ -217,10 +267,15 @@ export function ClassementTabs({
       {active === "1v1" && (
         <>
           <ul className="flex flex-col gap-0.5">
-            {duel1v1.length === 0 && <DataUnavailable message="Aucun duel joué pour l'instant." />}
-            {(expandedTabs.has("1v1") ? duel1v1 : duel1v1.slice(0, PAGE_SIZE)).map((p, i) => (
-              <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-                <Rank rank={i + 1} />
+            {duel1v1Filtered.length === 0 && (
+              <DataUnavailable
+                message={clubFilter ? "Aucun joueur de ce club dans ce classement." : "Aucun duel joué pour l'instant."}
+                showContact={!clubFilter}
+              />
+            )}
+            {(expandedTabs.has("1v1") ? duel1v1Filtered : duel1v1Filtered.slice(0, PAGE_SIZE)).map((p) => (
+              <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={p.rank} />
                 <Avatar name={p.name} color={colorFromSeed(p.name)} />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
                   <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
@@ -241,7 +296,7 @@ export function ClassementTabs({
             ))}
           </ul>
           {!expandedTabs.has("1v1") && (
-            <ShowMoreButton remaining={duel1v1.length - PAGE_SIZE} onClick={() => expandTab("1v1")} />
+            <ShowMoreButton remaining={duel1v1Filtered.length - PAGE_SIZE} onClick={() => expandTab("1v1")} />
           )}
         </>
       )}
@@ -249,10 +304,15 @@ export function ClassementTabs({
       {active === "casino" && (
         <>
           <ul className="flex flex-col gap-0.5">
-            {casino.length === 0 && <DataUnavailable message="Personne n'a encore de jetons." />}
-            {(expandedTabs.has("casino") ? casino : casino.slice(0, PAGE_SIZE)).map((p, i) => (
-              <li key={p.name + i} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
-                <Rank rank={i + 1} />
+            {casinoFiltered.length === 0 && (
+              <DataUnavailable
+                message={clubFilter ? "Aucun joueur de ce club dans ce classement." : "Personne n'a encore de jetons."}
+                showContact={!clubFilter}
+              />
+            )}
+            {(expandedTabs.has("casino") ? casinoFiltered : casinoFiltered.slice(0, PAGE_SIZE)).map((p) => (
+              <li key={p.tag ?? p.rank} className="flex items-center gap-3 rounded-xl px-3 py-2 odd:bg-surface-2">
+                <Rank rank={p.rank} />
                 <Avatar name={p.name} color={colorFromSeed(p.name)} />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90">
                   <PlayerLink tag={p.tag}>{p.name}</PlayerLink>
@@ -265,7 +325,7 @@ export function ClassementTabs({
             ))}
           </ul>
           {!expandedTabs.has("casino") && (
-            <ShowMoreButton remaining={casino.length - PAGE_SIZE} onClick={() => expandTab("casino")} />
+            <ShowMoreButton remaining={casinoFiltered.length - PAGE_SIZE} onClick={() => expandTab("casino")} />
           )}
         </>
       )}

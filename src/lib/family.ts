@@ -8,8 +8,12 @@ import {
   getFamilySeasonArchive,
   getFamilyJoueur,
   getFamilyActualites,
+  getFamilyClassement1v1,
+  getFamilyClassementCasino,
   type ApiClubRole,
   type ApiNewsItem,
+  type Api1v1Player,
+  type ApiCasinoPlayer,
 } from "./api";
 import { formatNumber, spaceClubName, colorFromSeed, formatRelativeTime } from "./format";
 import { getDiscordBadge } from "./access";
@@ -267,11 +271,57 @@ export type ClubDetail = {
   memberCount: number;
   isFlagship: boolean;
   roster: { rank: number; tag: string; name: string; trophies: string; role: ApiClubRole; color: string }[];
+  ranking: ClubRanking;
   // false si la fiche détaillée (description/rôles) n'a pas encore été
   // synchronisée côté bot — arrive juste après un déploiement, le temps
   // que sync_trophy_history tourne une première fois.
   synced: boolean;
 };
+
+const normTag = (t: string) => t.replace(/^#/, "").toUpperCase();
+
+export type ClubCategory<T> = { entries: T[]; unresolved: { tag: string; name: string; color: string }[] };
+
+const EMPTY_RANKING: ClubRanking = {
+  ranked: { entries: [], unresolved: [] },
+  rankedAllTime: { entries: [], unresolved: [] },
+  duel1v1: { entries: [], unresolved: [] },
+  casino: { entries: [], unresolved: [] },
+};
+
+export type ClubRanking = {
+  ranked: ClubCategory<RankedPlayer>;
+  rankedAllTime: ClubCategory<RankedPlayer>;
+  duel1v1: ClubCategory<Api1v1Player & { rank: number }>;
+  casino: ClubCategory<ApiCasinoPlayer & { rank: number }>;
+};
+
+// Reclasse une liste déjà globale (triée) en un classement LOCAL au club :
+// seuls les membres du roster (source de vérité = l'API officielle BS, pas
+// besoin de compte Discord lié) sont gardés, renumérotés 1..N dans l'ordre
+// où ils apparaissent dans `entries` (déjà trié en amont par la fonction
+// source). Les membres du roster absents de `entries` (pas encore
+// synchronisés, ou jamais liés côté Discord pour 1v1/casino) sortent dans
+// `unresolved`.
+function splitByRoster<T extends { tag?: string | null }>(
+  entries: T[],
+  roster: { tag: string; name: string; color: string }[]
+): ClubCategory<T & { rank: number }> {
+  const matched: (T & { rank: number })[] = [];
+  const matchedTags = new Set<string>();
+  for (const e of entries) {
+    if (!e.tag) continue;
+    const nt = normTag(e.tag);
+    if (roster.some((m) => normTag(m.tag) === nt) && !matchedTags.has(nt)) {
+      matched.push({ ...e, rank: matched.length + 1 });
+      matchedTags.add(nt);
+    }
+  }
+  const unresolved = roster
+    .filter((m) => !matchedTags.has(normTag(m.tag)))
+    .map((m) => ({ tag: m.tag, name: m.name, color: m.color }));
+  return { entries: matched, unresolved };
+}
 
 export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
   const clubs = await getFamilyClubs();
@@ -279,7 +329,13 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
   if (!club) return null;
 
   const rawTag = club.tag.replace(/^#/, "");
-  const detail = await getFamilyClanDetail(rawTag);
+  const [detail, ranked, rankedAllTime, duel1v1, casino] = await Promise.all([
+    getFamilyClanDetail(rawTag),
+    getRankedLeaderboard(),
+    getAllTimeRankedLeaderboard(),
+    getFamilyClassement1v1(),
+    getFamilyClassementCasino(),
+  ]);
 
   if (!detail) {
     return {
@@ -293,6 +349,7 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
       memberCount: club.memberCount,
       isFlagship: club.isFlagship,
       roster: [],
+      ranking: EMPTY_RANKING,
       synced: false,
     };
   }
@@ -309,6 +366,13 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
       color: colorFromSeed(m.tag),
     }));
 
+  const ranking: ClubRanking = {
+    ranked: splitByRoster(ranked, roster),
+    rankedAllTime: splitByRoster(rankedAllTime, roster),
+    duel1v1: splitByRoster(duel1v1 ?? [], roster),
+    casino: splitByRoster(casino ?? [], roster),
+  };
+
   return {
     name: club.name,
     tag: club.tag,
@@ -320,6 +384,7 @@ export async function getClubDetail(slug: string): Promise<ClubDetail | null> {
     memberCount: detail.members.length,
     isFlagship: club.isFlagship,
     roster,
+    ranking,
     synced: true,
   };
 }
