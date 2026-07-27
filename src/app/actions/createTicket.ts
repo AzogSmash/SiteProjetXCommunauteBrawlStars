@@ -1,19 +1,11 @@
 "use server";
 
 import { getAccessContext } from "@/lib/access";
+import { TICKET_CATEGORIES } from "@/lib/data";
 
 export type CreateTicketResult =
   | { ok: true; channelUrl: string; alreadyOpen: boolean }
   | { ok: false; error: string };
-
-// Mêmes clés que TICKET_CATEGORIES côté bot (main.py) — dupliqué, pas de
-// package partagé entre les deux repos (même logique que _RANKED_TIER_NAME_MAP).
-export const TICKET_CATEGORIES: { value: string; label: string }[] = [
-  { value: "candidature", label: "💼 Candidature" },
-  { value: "club_recruitment", label: "🎯 Recrutement Club" },
-  { value: "incident", label: "🔴 Incident" },
-  { value: "other", label: "❓ Autre" },
-];
 
 const VALID_CATEGORIES = new Set(TICKET_CATEGORIES.map((c) => c.value));
 const MAX_DESCRIPTION_LENGTH = 1000;

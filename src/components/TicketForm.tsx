@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { Loader2, CircleCheck, Send } from "lucide-react";
-import { createTicket, TICKET_CATEGORIES } from "@/app/actions/createTicket";
+import { createTicket } from "@/app/actions/createTicket";
+import { TICKET_CATEGORIES } from "@/lib/data";
 
 const MAX_DESCRIPTION_LENGTH = 1000;
 
