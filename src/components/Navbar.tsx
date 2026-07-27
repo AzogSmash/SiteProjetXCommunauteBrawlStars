@@ -47,10 +47,10 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
             <Link
               href={profileHref}
               aria-label="Mon profil"
-              className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/60 hover:text-primary-2 sm:flex"
+              className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border bg-surface p-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/60 hover:text-primary-2 sm:flex 2xl:px-4 2xl:py-2.5"
             >
               <CircleUserRound size={19} />
-              Mon profil
+              <span className="hidden 2xl:inline">Mon profil</span>
             </Link>
           )}
           <AuthButton />
