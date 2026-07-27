@@ -10,7 +10,10 @@ import { TrophyIcon } from "@/components/TrophyIcon";
 import { LockIcon } from "@/components/LockIcon";
 import { PlayerLink } from "@/components/PlayerLink";
 import { ClubRankingTabs } from "@/components/ClubRankingTabs";
+import { MemberNoteField } from "@/components/MemberNoteField";
 import { getClubDetail } from "@/lib/family";
+import { getFamilyMemberNotes } from "@/lib/api";
+import { getAccessContext } from "@/lib/access";
 import { discordInviteUrl } from "@/lib/data";
 
 export default async function ClubDetailPage({
@@ -19,8 +22,13 @@ export default async function ClubDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const club = await getClubDetail(slug);
+  const [club, access] = await Promise.all([getClubDetail(slug), getAccessContext()]);
   if (!club) notFound();
+
+  // Staff limité à son propre clan, admin sur tous — voir updateMemberNote
+  // côté server action, qui revérifie exactement la même règle.
+  const canEditNotes = access.tier === "admin" || (access.tier === "staff" && access.clubSlug === slug);
+  const notes = canEditNotes ? ((await getFamilyMemberNotes(slug)) ?? {}) : {};
 
   return (
     <>
@@ -94,6 +102,13 @@ export default async function ClubDetailPage({
                     <PlayerLink tag={member.tag}>{member.name}</PlayerLink>
                   </span>
                   <RoleBadge role={member.role} tag={member.tag} className="hidden sm:inline-flex" />
+                  {canEditNotes && (
+                    <MemberNoteField
+                      clubSlug={slug}
+                      tag={member.tag}
+                      initialNote={notes[member.tag.replace(/^#/, "").toUpperCase()]?.note ?? ""}
+                    />
+                  )}
                   <span className="w-24 text-right text-sm font-semibold text-foreground/90">
                     {member.trophies}
                   </span>

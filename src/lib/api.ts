@@ -258,3 +258,14 @@ export type ApiTicket = {
 export function getTicket(id: string) {
   return getJson<ApiTicket>(`/api/tickets/${encodeURIComponent(id)}`, { headers: internalHeaders() });
 }
+
+// Notes internes staff sur les membres d'un club (voir MemberNoteField) —
+// même protection par secret partagé que getStaffPanel, le site ne les
+// demande de toute façon que pour un viewer déjà vérifié staff/admin de ce club.
+export type ApiMemberNote = { note: string; updated_by: string; updated_at: string };
+
+export function getFamilyMemberNotes(slug: string) {
+  return getJson<Record<string, ApiMemberNote>>(`/api/famille/notes/${encodeURIComponent(slug)}`, {
+    headers: internalHeaders(),
+  });
+}
