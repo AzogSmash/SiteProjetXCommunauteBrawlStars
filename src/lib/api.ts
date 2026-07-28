@@ -11,6 +11,9 @@ const TIMEOUT_MS = 5000;
 // l'exception explicite : voir REVALIDATE_REALTIME sur getDiscordMember.
 const REVALIDATE_DEFAULT = 1800;
 const REVALIDATE_REALTIME = 0;
+// Pusheurs/évolution de saison — fenêtre plus courte que le reste du site
+// (demande du 26/07/2026, suite à un cache figé constaté sur /pusheurs).
+const REVALIDATE_EVOLUTION = 900;
 
 export type ApiClan = { tag: string; name: string; slug: string; alias: string };
 
@@ -113,7 +116,7 @@ export function getFamilyClanDetail(tag: string) {
 }
 
 export function getFamilyEvolution() {
-  return getJson<ApiEvolution>("/api/famille/evolution");
+  return getJson<ApiEvolution>("/api/famille/evolution", { revalidate: REVALIDATE_EVOLUTION });
 }
 
 export function getFamilySaisons() {
