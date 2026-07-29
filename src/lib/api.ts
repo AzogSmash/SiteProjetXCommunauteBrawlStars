@@ -270,6 +270,15 @@ export function getTicket(id: string) {
   return getJson<ApiTicket>(`/api/tickets/${encodeURIComponent(id)}`, { headers: internalHeaders() });
 }
 
+// État économie (pause casino / freeze crypto) pour le panel admin — même
+// protection par secret partagé que getStaffPanel, jamais mis en cache
+// (l'admin doit voir l'état réel juste après avoir cliqué un bouton).
+export type ApiEconomyStatus = { casino_paused: boolean; crypto_market_frozen: boolean };
+
+export function getAdminEconomyStatus() {
+  return getJson<ApiEconomyStatus>("/api/admin/economy/status", { headers: internalHeaders(), revalidate: REVALIDATE_REALTIME });
+}
+
 // Notes internes staff sur les membres d'un club (voir MemberNoteField) —
 // même protection par secret partagé que getStaffPanel, le site ne les
 // demande de toute façon que pour un viewer déjà vérifié staff/admin de ce club.

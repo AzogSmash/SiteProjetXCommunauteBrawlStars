@@ -21,7 +21,8 @@ import {
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
 import { NewsPublishForm } from "@/components/NewsPublishForm";
-import type { ApiStaffPanel, ApiModerationEntry, ModerationAction, ApiClan, ApiNewsItem } from "@/lib/api";
+import { EconomyPanel } from "@/components/EconomyPanel";
+import type { ApiStaffPanel, ApiModerationEntry, ModerationAction, ApiClan, ApiNewsItem, ApiEconomyStatus } from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
 
 type ClubRow = { club: string; total: number; count: number; top: { name: string; delta: number } };
@@ -112,12 +113,14 @@ export function AdminTabs({
   clubRows,
   clans,
   actualites,
+  economyStatus,
   initialTab,
 }: {
   panel: ApiStaffPanel | null;
   clubRows: ClubRow[];
   clans?: ApiClan[];
   actualites: ApiNewsItem[];
+  economyStatus: ApiEconomyStatus | null;
   initialTab?: string;
 }) {
   const tabs = clans ? TABS : TABS.filter((t) => t.id !== "clans");
@@ -279,12 +282,12 @@ export function AdminTabs({
         </Panel>
       )}
 
-      {active === "economie" && (
-        <ComingSoon
-          icon={Wallet}
-          text="Pause/reprise du casino, bannissements casino, ajustement de coins, freeze du marché crypto — pas encore branché sur le site, tout ça reste sur Discord pour l'instant."
-        />
-      )}
+      {active === "economie" &&
+        (economyStatus ? (
+          <EconomyPanel casinoPaused={economyStatus.casino_paused} cryptoFrozen={economyStatus.crypto_market_frozen} />
+        ) : (
+          <ComingSoon icon={Wallet} text="Réservé aux administrateurs." />
+        ))}
 
       {active === "tickets" && (
         <ComingSoon

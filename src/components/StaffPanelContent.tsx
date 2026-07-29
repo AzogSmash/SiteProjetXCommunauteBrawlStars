@@ -5,6 +5,7 @@ import {
   getFamily1v1Saisons,
   getFamilyCasinoSaisons,
   getFamilyActualites,
+  getAdminEconomyStatus,
   type ApiEvolutionEntry,
   type ApiClan,
 } from "@/lib/api";
@@ -36,13 +37,15 @@ function groupByClub(players: ApiEvolutionEntry[]) {
 // 21/07/2026), voir lib/access.ts. `clans` n'est passé que par /admin
 // (l'onglet Clans reste caché pour le staff simple).
 export async function StaffPanelContent({ clans }: { clans?: ApiClan[] }) {
-  const [panel, evolution, bsSeasons, duel1v1Seasons, casinoSeasons, actualites] = await Promise.all([
+  const isAdmin = clans !== undefined;
+  const [panel, evolution, bsSeasons, duel1v1Seasons, casinoSeasons, actualites, economyStatus] = await Promise.all([
     getStaffPanel(),
     getFamilyEvolution(),
     getFamilySaisons(),
     getFamily1v1Saisons(),
     getFamilyCasinoSaisons(),
     getFamilyActualites(10),
+    isAdmin ? getAdminEconomyStatus() : Promise.resolve(null),
   ]);
   const clubRows = evolution ? groupByClub(evolution.players) : [];
 
@@ -58,7 +61,13 @@ export async function StaffPanelContent({ clans }: { clans?: ApiClan[] }) {
         seasonLabels={seasonLabels}
       />
 
-      <AdminTabs panel={panel} clubRows={clubRows} clans={clans} actualites={actualites ?? []} />
+      <AdminTabs
+        panel={panel}
+        clubRows={clubRows}
+        clans={clans}
+        actualites={actualites ?? []}
+        economyStatus={economyStatus}
+      />
     </>
   );
 }
