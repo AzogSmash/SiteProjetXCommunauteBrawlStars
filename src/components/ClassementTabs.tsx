@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Crown } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { TierIcon } from "./TierIcon";
@@ -87,6 +88,10 @@ export function ClassementTabs({
   casino,
   clubs,
   initialTab,
+  seasons1v1,
+  seasonsCasino,
+  selectedSeason1v1,
+  selectedSeasonCasino,
 }: {
   ranked: RankedPlayer[];
   rankedAllTime: RankedPlayer[];
@@ -95,11 +100,29 @@ export function ClassementTabs({
   casino: CasinoRow[];
   clubs: { value: string; label: string }[];
   initialTab?: string;
+  seasons1v1: { value: string; label: string }[];
+  seasonsCasino: { value: string; label: string }[];
+  selectedSeason1v1: string | null;
+  selectedSeasonCasino: string | null;
 }) {
   const [active, setActive] = useState<TabId>(isTabId(initialTab) ? initialTab : "ranked");
   const [expandedTabs, setExpandedTabs] = useState<Set<TabId>>(new Set());
   const expandTab = (id: TabId) => setExpandedTabs((prev) => new Set(prev).add(id));
   const [clubFilter, setClubFilter] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Change de saison archivée pour le 1v1/casino : contrairement au filtre
+  // club (purement client, sur des données déjà chargées), changer de saison
+  // change QUELLES données charger — direction serveur via l'URL, comme `tab`.
+  function setSeason(param: "saison1v1" | "saisoncasino", value: string, tab: TabId) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(param, value);
+    else params.delete(param);
+    params.set("tab", tab);
+    router.push(`${pathname}?${params.toString()}`);
+  }
 
   const rankedFiltered = byClub(ranked, clubFilter);
   const rankedAllTimeFiltered = byClub(rankedAllTime, clubFilter);
@@ -160,6 +183,34 @@ export function ClassementTabs({
             {clubs.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
+              </option>
+            ))}
+          </select>
+        )}
+        {active === "1v1" && seasons1v1.length > 0 && (
+          <select
+            value={selectedSeason1v1 ?? ""}
+            onChange={(e) => setSeason("saison1v1", e.target.value, "1v1")}
+            className="shrink-0 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+          >
+            <option value="">Mois en cours</option>
+            {seasons1v1.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        )}
+        {active === "casino" && seasonsCasino.length > 0 && (
+          <select
+            value={selectedSeasonCasino ?? ""}
+            onChange={(e) => setSeason("saisoncasino", e.target.value, "casino")}
+            className="shrink-0 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+          >
+            <option value="">Mois en cours</option>
+            {seasonsCasino.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
               </option>
             ))}
           </select>

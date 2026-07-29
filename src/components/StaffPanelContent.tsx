@@ -1,9 +1,20 @@
-import { Users, UserPlus, ShieldAlert, VolumeX, Ban, Lock, LockOpen, Radio, Flag, TrendingUp, FileSpreadsheet } from "lucide-react";
+import { Users, UserPlus, ShieldAlert, VolumeX, Ban, Lock, LockOpen, Radio, Flag, TrendingUp } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
-import { getStaffPanel, getFamilyEvolution, type ApiEvolutionEntry, type ApiModerationEntry, type ModerationAction } from "@/lib/api";
+import {
+  getStaffPanel,
+  getFamilyEvolution,
+  getFamilySaisons,
+  getFamily1v1Saisons,
+  getFamilyCasinoSaisons,
+  type ApiEvolutionEntry,
+  type ApiModerationEntry,
+  type ModerationAction,
+} from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
+import { monthLabel } from "@/lib/family";
 import { NewsPublishForm } from "@/components/NewsPublishForm";
+import { ExportPanel } from "@/components/ExportPanel";
 
 function groupByClub(players: ApiEvolutionEntry[]) {
   const byClub = new Map<string, { total: number; players: ApiEvolutionEntry[] }>();
@@ -87,20 +98,26 @@ function ModerationRow({ entry }: { entry: ApiModerationEntry }) {
 // tout ce que voit un staff, cf. modèle d'accès cumulatif décidé le
 // 21/07/2026), voir lib/access.ts.
 export async function StaffPanelContent() {
-  const [panel, evolution] = await Promise.all([getStaffPanel(), getFamilyEvolution()]);
+  const [panel, evolution, bsSeasons, duel1v1Seasons, casinoSeasons] = await Promise.all([
+    getStaffPanel(),
+    getFamilyEvolution(),
+    getFamilySaisons(),
+    getFamily1v1Saisons(),
+    getFamilyCasinoSaisons(),
+  ]);
   const clubRows = evolution ? groupByClub(evolution.players) : [];
+
+  const allSeasonKeys = new Set([...(bsSeasons ?? []), ...(duel1v1Seasons ?? []), ...(casinoSeasons ?? [])]);
+  const seasonLabels = Object.fromEntries([...allSeasonKeys].map((m) => [m, monthLabel(m)]));
 
   return (
     <>
-      <div className="mb-6 flex justify-end">
-        <a
-          href="/api/export"
-          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-2 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(113,54,186,0.3)] transition-transform hover:scale-[1.03]"
-        >
-          <FileSpreadsheet size={16} />
-          Exporter les classements (Excel)
-        </a>
-      </div>
+      <ExportPanel
+        duel1v1Seasons={duel1v1Seasons ?? []}
+        casinoSeasons={casinoSeasons ?? []}
+        bsSeasons={bsSeasons ?? []}
+        seasonLabels={seasonLabels}
+      />
 
       <div className="mb-6">
         <Panel title="Publier une actualité">

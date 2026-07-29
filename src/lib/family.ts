@@ -437,7 +437,7 @@ const MONTH_NAMES = [
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
 ];
 
-function monthLabel(month: string): string {
+export function monthLabel(month: string): string {
   const [year, m] = month.split("-").map(Number);
   const name = MONTH_NAMES[(m ?? 1) - 1] ?? month;
   return `${name} ${year}`;

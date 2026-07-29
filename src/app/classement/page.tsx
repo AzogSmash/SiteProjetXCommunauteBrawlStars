@@ -1,7 +1,13 @@
 import { PageHeader } from "@/components/PageHeader";
 import { ClassementTabs } from "@/components/ClassementTabs";
-import { getRankedLeaderboard, getAllTimeRankedLeaderboard, getPlayersLeaderboard } from "@/lib/family";
-import { getFamilyClassement1v1, getFamilyClassementCasino, getFamilyClans } from "@/lib/api";
+import { getRankedLeaderboard, getAllTimeRankedLeaderboard, getPlayersLeaderboard, monthLabel } from "@/lib/family";
+import {
+  getFamilyClassement1v1,
+  getFamilyClassementCasino,
+  getFamilyClans,
+  getFamily1v1Saisons,
+  getFamilyCasinoSaisons,
+} from "@/lib/api";
 import { spaceClubName } from "@/lib/format";
 
 const normTag = (t: string) => t.replace(/^#/, "").toUpperCase();
@@ -9,16 +15,18 @@ const normTag = (t: string) => t.replace(/^#/, "").toUpperCase();
 export default async function ClassementPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; saison1v1?: string; saisoncasino?: string }>;
 }) {
-  const [{ tab }, ranked, rankedAllTime, trophees, duel1v1, casino, clans] = await Promise.all([
-    searchParams,
+  const { tab, saison1v1, saisoncasino } = await searchParams;
+  const [ranked, rankedAllTime, trophees, duel1v1, casino, clans, seasons1v1, seasonsCasino] = await Promise.all([
     getRankedLeaderboard(),
     getAllTimeRankedLeaderboard(),
     getPlayersLeaderboard(),
-    getFamilyClassement1v1(),
-    getFamilyClassementCasino(),
+    getFamilyClassement1v1(saison1v1),
+    getFamilyClassementCasino(saisoncasino),
     getFamilyClans(),
+    getFamily1v1Saisons(),
+    getFamilyCasinoSaisons(),
   ]);
 
   // 1v1/casino sont des classements internes au Discord (compte lié, pas le
@@ -40,6 +48,8 @@ export default async function ClassementPage({
   }));
 
   const clubs = clans?.map((c) => ({ value: c.name, label: spaceClubName(c.name) })) ?? [];
+  const seasons1v1Options = (seasons1v1 ?? []).map((m) => ({ value: m, label: monthLabel(m) }));
+  const seasonsCasinoOptions = (seasonsCasino ?? []).map((m) => ({ value: m, label: monthLabel(m) }));
 
   return (
     <>
@@ -58,6 +68,10 @@ export default async function ClassementPage({
           casino={casinoWithClub}
           clubs={clubs}
           initialTab={tab}
+          seasons1v1={seasons1v1Options}
+          seasonsCasino={seasonsCasinoOptions}
+          selectedSeason1v1={saison1v1 ?? null}
+          selectedSeasonCasino={saisoncasino ?? null}
         />
       </main>
     </>

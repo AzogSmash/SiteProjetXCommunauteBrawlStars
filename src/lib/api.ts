@@ -147,8 +147,12 @@ export function getFamilySeasonArchive(month: string) {
 
 export type Api1v1Player = { name: string; tag: string | null; points: number; wins: number; losses: number; tier: string };
 
-export function getFamilyClassement1v1() {
-  return getJson<Api1v1Player[]>("/api/famille/classement_1v1");
+export function getFamilyClassement1v1(mois?: string) {
+  return getJson<Api1v1Player[]>(`/api/famille/classement_1v1${mois ? `?mois=${encodeURIComponent(mois)}` : ""}`);
+}
+
+export function getFamily1v1Saisons() {
+  return getJson<string[]>("/api/famille/saisons_1v1");
 }
 
 export type ApiPlayerProfile = {
@@ -178,8 +182,12 @@ export function getFamilyJoueur(tag: string) {
 
 export type ApiCasinoPlayer = { name: string; tag: string | null; coins: number };
 
-export function getFamilyClassementCasino() {
-  return getJson<ApiCasinoPlayer[]>("/api/famille/classement_casino");
+export function getFamilyClassementCasino(mois?: string) {
+  return getJson<ApiCasinoPlayer[]>(`/api/famille/classement_casino${mois ? `?mois=${encodeURIComponent(mois)}` : ""}`);
+}
+
+export function getFamilyCasinoSaisons() {
+  return getJson<string[]>("/api/famille/saisons_casino");
 }
 
 // Miroir des rôles Discord (voir supabase/003_discord_members.sql côté bot)
