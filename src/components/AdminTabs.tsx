@@ -12,7 +12,6 @@ import {
   Radio,
   Flag,
   TrendingUp,
-  ShieldCheck,
   Wallet,
   Ticket,
   Newspaper,
@@ -22,6 +21,7 @@ import { Panel } from "@/components/Panel";
 import { StatItem } from "@/components/StatItem";
 import { NewsPublishForm } from "@/components/NewsPublishForm";
 import { EconomyPanel } from "@/components/EconomyPanel";
+import { ClansPanel } from "@/components/ClansPanel";
 import type { ApiStaffPanel, ApiModerationEntry, ModerationAction, ApiClan, ApiNewsItem, ApiEconomyStatus } from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
 
@@ -259,28 +259,7 @@ export function AdminTabs({
         </Panel>
       )}
 
-      {active === "clans" && clans && (
-        <Panel title="Configuration actuelle — clans de la famille">
-          <ul className="flex flex-col gap-1">
-            {clans.map((c) => (
-              <li key={c.tag} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm odd:bg-surface-2">
-                <IconChip>
-                  <ShieldCheck size={15} />
-                </IconChip>
-                <span className="min-w-0 flex-1 truncate font-medium text-foreground/90">{c.name}</span>
-                <span className="text-xs text-muted">#{c.tag}</span>
-                <span className="text-xs text-muted">
-                  !{c.slug}
-                  {c.alias ? ` / !${c.alias}` : ""}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4">
-            <ComingSoon text="Ajout/retrait de clan depuis le site arrive dans une prochaine passe — pour l'instant, utilise !bs_famille sur Discord." />
-          </div>
-        </Panel>
-      )}
+      {active === "clans" && clans && <ClansPanel clans={clans} />}
 
       {active === "economie" &&
         (economyStatus ? (
