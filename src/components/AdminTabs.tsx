@@ -22,6 +22,7 @@ import { NewsPublishForm } from "@/components/NewsPublishForm";
 import { EconomyPanel } from "@/components/EconomyPanel";
 import { ClansPanel } from "@/components/ClansPanel";
 import { TicketsPanel } from "@/components/TicketsPanel";
+import { ModerationPanel } from "@/components/ModerationPanel";
 import type {
   ApiStaffPanel,
   ApiModerationEntry,
@@ -228,17 +229,21 @@ export function AdminTabs({
       )}
 
       {active === "moderation" && (
-        <Panel title="Journal de modération">
-          {!panel || panel.moderation_log.length === 0 ? (
-            <EmptyState text="Aucune action de modération récente." />
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {panel.moderation_log.map((entry, i) => (
-                <ModerationRow key={`mod-${i}`} entry={entry} />
-              ))}
-            </ul>
-          )}
-        </Panel>
+        <div className="flex flex-col gap-6">
+          {clans !== undefined && <ModerationPanel />}
+
+          <Panel title="Journal de modération">
+            {!panel || panel.moderation_log.length === 0 ? (
+              <EmptyState text="Aucune action de modération récente." />
+            ) : (
+              <ul className="flex flex-col gap-1">
+                {panel.moderation_log.map((entry, i) => (
+                  <ModerationRow key={`mod-${i}`} entry={entry} />
+                ))}
+              </ul>
+            )}
+          </Panel>
+        </div>
       )}
 
       {active === "ranked1v1" && (
