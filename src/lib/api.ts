@@ -279,6 +279,28 @@ export function getAdminEconomyStatus() {
   return getJson<ApiEconomyStatus>("/api/admin/economy/status", { headers: internalHeaders(), revalidate: REVALIDATE_REALTIME });
 }
 
+// Tickets ouverts pour l'onglet Tickets du panel staff/admin — discordId
+// sert à la vérification staff côté bot (voir _require_ticket_staff),
+// jamais mis en cache pour la même raison que getAdminEconomyStatus.
+export type ApiTicketSummary = {
+  id: number;
+  discord_id: string;
+  bs_tag: string | null;
+  category: string;
+  description: string;
+  channel_id: string;
+  status: "open" | "closed";
+  claimed_by: string | null;
+  created_at: string;
+};
+
+export function getAdminTickets(discordId: string) {
+  return getJson<ApiTicketSummary[]>(`/api/admin/tickets?discord_id=${encodeURIComponent(discordId)}`, {
+    headers: internalHeaders(),
+    revalidate: REVALIDATE_REALTIME,
+  });
+}
+
 // Notes internes staff sur les membres d'un club (voir MemberNoteField) —
 // même protection par secret partagé que getStaffPanel, le site ne les
 // demande de toute façon que pour un viewer déjà vérifié staff/admin de ce club.

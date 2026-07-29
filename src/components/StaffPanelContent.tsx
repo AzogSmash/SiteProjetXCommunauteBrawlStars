@@ -6,10 +6,12 @@ import {
   getFamilyCasinoSaisons,
   getFamilyActualites,
   getAdminEconomyStatus,
+  getAdminTickets,
   type ApiEvolutionEntry,
   type ApiClan,
 } from "@/lib/api";
 import { monthLabel } from "@/lib/family";
+import { getAccessContext } from "@/lib/access";
 import { ExportPanel } from "@/components/ExportPanel";
 import { AdminTabs } from "@/components/AdminTabs";
 
@@ -38,7 +40,8 @@ function groupByClub(players: ApiEvolutionEntry[]) {
 // (l'onglet Clans reste caché pour le staff simple).
 export async function StaffPanelContent({ clans }: { clans?: ApiClan[] }) {
   const isAdmin = clans !== undefined;
-  const [panel, evolution, bsSeasons, duel1v1Seasons, casinoSeasons, actualites, economyStatus] = await Promise.all([
+  const access = await getAccessContext();
+  const [panel, evolution, bsSeasons, duel1v1Seasons, casinoSeasons, actualites, economyStatus, tickets] = await Promise.all([
     getStaffPanel(),
     getFamilyEvolution(),
     getFamilySaisons(),
@@ -46,6 +49,7 @@ export async function StaffPanelContent({ clans }: { clans?: ApiClan[] }) {
     getFamilyCasinoSaisons(),
     getFamilyActualites(10),
     isAdmin ? getAdminEconomyStatus() : Promise.resolve(null),
+    access.discordId ? getAdminTickets(access.discordId) : Promise.resolve(null),
   ]);
   const clubRows = evolution ? groupByClub(evolution.players) : [];
 
@@ -67,6 +71,7 @@ export async function StaffPanelContent({ clans }: { clans?: ApiClan[] }) {
         clans={clans}
         actualites={actualites ?? []}
         economyStatus={economyStatus}
+        tickets={tickets ?? []}
       />
     </>
   );

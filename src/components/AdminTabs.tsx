@@ -13,7 +13,6 @@ import {
   Flag,
   TrendingUp,
   Wallet,
-  Ticket,
   Newspaper,
   Hammer,
 } from "lucide-react";
@@ -22,7 +21,16 @@ import { StatItem } from "@/components/StatItem";
 import { NewsPublishForm } from "@/components/NewsPublishForm";
 import { EconomyPanel } from "@/components/EconomyPanel";
 import { ClansPanel } from "@/components/ClansPanel";
-import type { ApiStaffPanel, ApiModerationEntry, ModerationAction, ApiClan, ApiNewsItem, ApiEconomyStatus } from "@/lib/api";
+import { TicketsPanel } from "@/components/TicketsPanel";
+import type {
+  ApiStaffPanel,
+  ApiModerationEntry,
+  ModerationAction,
+  ApiClan,
+  ApiNewsItem,
+  ApiEconomyStatus,
+  ApiTicketSummary,
+} from "@/lib/api";
 import { formatDateTime, formatNumber, spaceClubName } from "@/lib/format";
 
 type ClubRow = { club: string; total: number; count: number; top: { name: string; delta: number } };
@@ -114,6 +122,7 @@ export function AdminTabs({
   clans,
   actualites,
   economyStatus,
+  tickets,
   initialTab,
 }: {
   panel: ApiStaffPanel | null;
@@ -121,6 +130,7 @@ export function AdminTabs({
   clans?: ApiClan[];
   actualites: ApiNewsItem[];
   economyStatus: ApiEconomyStatus | null;
+  tickets: ApiTicketSummary[];
   initialTab?: string;
 }) {
   const tabs = clans ? TABS : TABS.filter((t) => t.id !== "clans");
@@ -268,12 +278,7 @@ export function AdminTabs({
           <ComingSoon icon={Wallet} text="Réservé aux administrateurs." />
         ))}
 
-      {active === "tickets" && (
-        <ComingSoon
-          icon={Ticket}
-          text="Liste des tickets ouverts et fermeture depuis le site — pas encore branché, utilise !fermer_ticket sur Discord en attendant."
-        />
-      )}
+      {active === "tickets" && <TicketsPanel tickets={tickets} />}
 
       {active === "contenu" && (
         <>
