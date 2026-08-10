@@ -5,6 +5,10 @@ export const navLinks = [
   { label: "Pusheurs", href: "/pusheurs" },
   { label: "Actualités", href: "/actualites" },
   { label: "Support", href: "/support" },
+  // Externe — pas de page "brawlers" sur le site, juste un lien pratique
+  // vers un tier-list/builds déjà maintenu ailleurs (demande du 10/08/2026,
+  // pas question de scraper/répliquer leur contenu, voir discussion).
+  { label: "Builds", href: "https://www.noff.gg/brawl-stars/builds", external: true },
 ];
 
 export const communityDescription =

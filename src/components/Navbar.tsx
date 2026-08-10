@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CircleUserRound, Menu, X } from "lucide-react";
+import { CircleUserRound, Menu, X, ExternalLink } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import { LogoWordmark } from "./Logo";
 import { AuthButton } from "./AuthButton";
@@ -24,18 +24,21 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
         <nav className="hidden flex-1 items-center gap-8 lg:flex">
           {navLinks.map((link) => {
             const active =
-              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+              !link.external && (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href));
             return (
               <Link
                 key={link.label}
                 href={link.href}
+                target={link.external ? "_blank" : undefined}
+                rel={link.external ? "noopener noreferrer" : undefined}
                 className={
                   active
                     ? "relative text-sm font-semibold uppercase tracking-wide text-foreground after:absolute after:-bottom-[18px] after:left-0 after:h-[2px] after:w-full after:bg-primary"
-                    : "text-sm font-medium uppercase tracking-wide text-muted transition-colors hover:text-foreground"
+                    : "flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-muted transition-colors hover:text-foreground"
                 }
               >
                 {link.label}
+                {link.external && <ExternalLink size={12} />}
               </Link>
             );
           })}
@@ -71,19 +74,22 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link) => {
               const active =
-                link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                !link.external && (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href));
               return (
                 <Link
                   key={link.label}
                   href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
                   onClick={() => setMobileOpen(false)}
                   className={
                     active
                       ? "rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-bold uppercase tracking-wide text-primary-2"
-                      : "rounded-lg px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground/90 hover:bg-surface-2"
+                      : "flex items-center gap-1 rounded-lg px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground/90 hover:bg-surface-2"
                   }
                 >
                   {link.label}
+                  {link.external && <ExternalLink size={12} />}
                 </Link>
               );
             })}
