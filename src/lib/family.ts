@@ -647,6 +647,7 @@ export type BestBuild = {
   slug: string;
   brawlerName: string;
   comment: string;
+  updatedAt: string;
 };
 
 // [] si le bot n'est pas joignable ou qu'aucun build n'a encore été publié
@@ -658,5 +659,11 @@ export async function getBestBuilds(): Promise<BestBuild[]> {
     slug: b.brawler_slug,
     brawlerName: b.brawler_name,
     comment: b.comment,
+    updatedAt: b.updated_at,
   }));
+}
+
+export async function getBestBuild(slug: string): Promise<BestBuild | null> {
+  const builds = await getBestBuilds();
+  return builds.find((b) => b.slug === slug) ?? null;
 }

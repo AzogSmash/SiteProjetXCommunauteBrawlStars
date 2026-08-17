@@ -16,12 +16,12 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center gap-8 px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-4 xl:gap-8">
         <Link href="/" className="shrink-0">
           <LogoWordmark />
         </Link>
 
-        <nav className="hidden flex-1 items-center gap-8 lg:flex">
+        <nav className="hidden flex-1 items-center gap-5 lg:flex xl:gap-8">
           {navLinks.map((link) => {
             const active =
               link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -31,8 +31,8 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
                 href={link.href}
                 className={
                   active
-                    ? "relative text-sm font-semibold uppercase tracking-wide text-foreground after:absolute after:-bottom-[18px] after:left-0 after:h-[2px] after:w-full after:bg-primary"
-                    : "text-sm font-medium uppercase tracking-wide text-muted transition-colors hover:text-foreground"
+                    ? "relative whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-foreground after:absolute after:-bottom-[18px] after:left-0 after:h-[2px] after:w-full after:bg-primary"
+                    : "whitespace-nowrap text-sm font-medium uppercase tracking-wide text-muted transition-colors hover:text-foreground"
                 }
               >
                 {link.label}
@@ -42,7 +42,10 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
-          <SearchBar className="hidden w-48 md:block xl:w-64" />
+          {/* Décalé à lg (au lieu de md) pour ne pas se serrer avec la nav
+              complète entre 1024-1280px — la version dans le menu mobile
+              (plus bas) prend le relais jusque-là (même seuil lg:hidden). */}
+          <SearchBar className="hidden lg:block lg:w-40 xl:w-64" />
           {profileHref && (
             <Link
               href={profileHref}
@@ -67,7 +70,7 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
 
       {mobileOpen && (
         <nav className="border-t border-border px-6 py-3 lg:hidden">
-          <SearchBar className="mb-2 w-full md:hidden" />
+          <SearchBar className="mb-2 w-full lg:hidden" />
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link) => {
               const active =

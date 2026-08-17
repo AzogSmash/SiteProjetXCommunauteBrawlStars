@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/PageHeader";
-import { BestBuildCard } from "@/components/BestBuildCard";
-import { DataUnavailable } from "@/components/DataUnavailable";
+import { BestBuildsGrid } from "@/components/BestBuildsGrid";
 import { getBestBuilds } from "@/lib/family";
 
 export default async function BestBuildsPage() {
@@ -19,15 +18,7 @@ export default async function BestBuildsPage() {
       </p>
 
       <main className="mx-auto max-w-7xl px-6 pb-14">
-        {builds.length === 0 ? (
-          <DataUnavailable message="Aucun build publié pour l'instant." showContact={false} />
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {builds.map((build) => (
-              <BestBuildCard key={build.slug} {...build} />
-            ))}
-          </div>
-        )}
+        <BestBuildsGrid builds={builds} />
       </main>
     </>
   );
