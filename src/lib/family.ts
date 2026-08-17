@@ -10,6 +10,7 @@ import {
   getFamilyActualites,
   getFamilyClassement1v1,
   getFamilyClassementCasino,
+  getFamilyBestBuilds,
   type ApiClubRole,
   type ApiNewsItem,
   type Api1v1Player,
@@ -639,5 +640,23 @@ export async function getFamilyNews(limit?: number): Promise<NewsItem[]> {
     title: n.title,
     description: n.description,
     time: formatRelativeTime(n.created_at),
+  }));
+}
+
+export type BestBuild = {
+  slug: string;
+  brawlerName: string;
+  comment: string;
+};
+
+// [] si le bot n'est pas joignable ou qu'aucun build n'a encore été publié
+// — même philosophie "pas de fausses données" que getFamilyNews.
+export async function getBestBuilds(): Promise<BestBuild[]> {
+  const items = await getFamilyBestBuilds();
+  if (!items) return [];
+  return items.map((b) => ({
+    slug: b.brawler_slug,
+    brawlerName: b.brawler_name,
+    comment: b.comment,
   }));
 }

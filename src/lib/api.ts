@@ -136,6 +136,19 @@ export function getFamilyActualites(limit?: number) {
   return getJson<ApiNewsItem[]>(`/api/famille/actualites${limit ? `?limit=${limit}` : ""}`);
 }
 
+export type ApiBestBuild = {
+  brawler_slug: string;
+  brawler_name: string;
+  comment: string;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export function getFamilyBestBuilds() {
+  return getJson<ApiBestBuild[]>("/api/famille/best_builds");
+}
+
 export type ApiSeasonArchive = Record<
   string,
   { name: string; club: string | null; start: number; end: number; delta: number }
