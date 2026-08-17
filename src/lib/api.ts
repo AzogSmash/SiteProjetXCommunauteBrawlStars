@@ -279,8 +279,15 @@ export type ApiTicket = {
   closed_at: string | null;
 };
 
-export function getTicket(id: string) {
-  return getJson<ApiTicket>(`/api/tickets/${encodeURIComponent(id)}`, { headers: internalHeaders() });
+// discordId requis depuis le 17/08/2026 : le bot vérifie maintenant l'accès
+// lui-même (les tickets "incident" sont réservés au staff Discord, voir
+// _is_incident_staff côté bot) plutôt que de ne dépendre que du check de
+// tier fait par la page appelante.
+export function getTicket(id: string, discordId: string) {
+  return getJson<ApiTicket>(
+    `/api/tickets/${encodeURIComponent(id)}?discord_id=${encodeURIComponent(discordId)}`,
+    { headers: internalHeaders() }
+  );
 }
 
 // État économie (pause casino / freeze crypto) pour le panel admin — même

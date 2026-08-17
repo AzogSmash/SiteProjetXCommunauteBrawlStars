@@ -13,10 +13,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default async function TicketTranscriptPage({ params }: { params: Promise<{ id: string }> }) {
   const access = await getAccessContext();
-  if (access.tier !== "staff" && access.tier !== "admin") redirect("/");
+  if ((access.tier !== "staff" && access.tier !== "admin") || !access.discordId) redirect("/");
 
   const { id } = await params;
-  const ticket = await getTicket(id);
+  const ticket = await getTicket(id, access.discordId);
   if (!ticket) notFound();
 
   return (
