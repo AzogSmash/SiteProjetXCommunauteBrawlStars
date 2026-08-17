@@ -3,7 +3,7 @@ export const navLinks = [
   { label: "Clubs", href: "/clubs" },
   { label: "Classement", href: "/classement" },
   { label: "Pusheurs", href: "/pusheurs" },
-  { label: "Meilleurs builds", href: "/best-builds" },
+  { label: "Builds", href: "/best-builds" },
   { label: "Actualités", href: "/actualites" },
   { label: "Support", href: "/support" },
 ];
