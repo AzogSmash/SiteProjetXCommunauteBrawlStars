@@ -71,22 +71,19 @@ export function Navbar({ bsTag }: { bsTag: string | null }) {
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link) => {
               const active =
-                !link.external && (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href));
+                link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
               return (
                 <Link
                   key={link.label}
                   href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noopener noreferrer" : undefined}
                   onClick={() => setMobileOpen(false)}
                   className={
                     active
                       ? "rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-bold uppercase tracking-wide text-primary-2"
-                      : "flex items-center gap-1 rounded-lg px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground/90 hover:bg-surface-2"
+                      : "rounded-lg px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground/90 hover:bg-surface-2"
                   }
                 >
                   {link.label}
-                  {link.external && <ExternalLink size={12} />}
                 </Link>
               );
             })}
