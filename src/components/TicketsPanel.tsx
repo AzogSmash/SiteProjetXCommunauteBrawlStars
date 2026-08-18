@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Lock, Loader2 } from "lucide-react";
 import { Panel } from "@/components/Panel";
+import { ClosedTicketsPanel } from "@/components/ClosedTicketsPanel";
 import { fermerTicket } from "@/app/actions/adminTickets";
 import { formatDateTime } from "@/lib/format";
 import type { ApiTicketSummary } from "@/lib/api";
@@ -89,9 +90,32 @@ function TicketRow({ ticket }: { ticket: ApiTicketSummary }) {
 }
 
 export function TicketsPanel({ tickets }: { tickets: ApiTicketSummary[] }) {
+  const [view, setView] = useState<"open" | "closed">("open");
+
   return (
-    <Panel title={`Tickets ouverts — ${tickets.length}`}>
-      {tickets.length === 0 ? (
+    <Panel title={view === "open" ? `Tickets ouverts — ${tickets.length}` : "Historique des tickets fermés"}>
+      <div className="mb-4 flex gap-1 rounded-full border border-border bg-surface-2 p-1 sm:w-fit">
+        <button
+          onClick={() => setView("open")}
+          className={`flex-1 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors sm:flex-none ${
+            view === "open" ? "bg-gradient-to-r from-primary to-primary-2 text-white" : "text-muted hover:text-foreground"
+          }`}
+        >
+          Ouverts
+        </button>
+        <button
+          onClick={() => setView("closed")}
+          className={`flex-1 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors sm:flex-none ${
+            view === "closed" ? "bg-gradient-to-r from-primary to-primary-2 text-white" : "text-muted hover:text-foreground"
+          }`}
+        >
+          Fermés
+        </button>
+      </div>
+
+      {view === "closed" ? (
+        <ClosedTicketsPanel />
+      ) : tickets.length === 0 ? (
         <p className="px-3 py-6 text-sm text-muted">Aucun ticket ouvert pour l&apos;instant.</p>
       ) : (
         <ul className="flex flex-col gap-1">
