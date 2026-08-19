@@ -14,6 +14,12 @@ const REVALIDATE_REALTIME = 0;
 // Pusheurs/évolution de saison — fenêtre plus courte que le reste du site
 // (demande du 26/07/2026, suite à un cache figé constaté sur /pusheurs).
 const REVALIDATE_EVOLUTION = 900;
+// Meilleurs builds — le cache de fetch de Next.js/Vercel survit aux
+// redéploiements (contrairement à ce qu'on pourrait croire), donc un simple
+// push après un nouvel ajout ne suffit pas à le rafraîchir : fenêtre courte
+// plutôt que d'attendre 30 min ou de forcer un déploiement à chaque lot de
+// builds ajouté (constaté le 19/08/2026).
+const REVALIDATE_BEST_BUILDS = 300;
 
 export type ApiClan = { tag: string; name: string; slug: string; alias: string };
 
@@ -146,7 +152,7 @@ export type ApiBestBuild = {
 };
 
 export function getFamilyBestBuilds() {
-  return getJson<ApiBestBuild[]>("/api/famille/best_builds");
+  return getJson<ApiBestBuild[]>("/api/famille/best_builds", { revalidate: REVALIDATE_BEST_BUILDS });
 }
 
 export type ApiSeasonArchive = Record<
