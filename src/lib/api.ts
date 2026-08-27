@@ -1,8 +1,10 @@
 // Client pour l'API famille exposée par le bot (voir SITE_FAMILLE_BS_CONTEXT.md).
 // Fetch côté serveur uniquement (Server Components) — jamais depuis le
-// navigateur. Chaque fonction renvoie `null` en cas d'échec/timeout plutôt
-// que de faire planter le rendu de la page ; les appelants retombent alors
-// sur les données de démo.
+// navigateur. Chaque fonction renvoie `null` en cas d'échec/timeout total
+// (bot injoignable ET aucune valeur récupérable en repli, voir
+// lastGoodCache ci-dessous) plutôt que de faire planter le rendu de la
+// page ; les appelants affichent alors un état "pas de données" (voir
+// DataUnavailable), plus de données de démo depuis le 23/07/2026.
 
 const API_BASE = process.env.BS_API_URL;
 const TIMEOUT_MS = 5000;
@@ -75,12 +77,24 @@ export type ApiEvolution = {
   players: ApiEvolutionEntry[];
 };
 
+// Repli en mémoire (par instance serverless) sur la dernière réponse réussie
+// par route, servie si le bot est injoignable plutôt que d'afficher "pas de
+// données" alors qu'on a déjà une valeur récente. Nécessaire avec ce build
+// de Next.js : contrairement au comportement "classique", une entrée de
+// cache stale déclenche un vrai refetch en direct (voir fetch.md, section
+// options.cache) — si ce refetch échoue (bot down), tout échoue, aucun
+// repli automatique sur l'ancienne valeur. Limite assumée : une instance
+// qui vient de démarrer (cold start Vercel) n'a rien à proposer avant son
+// premier fetch réussi. Demande du 24/08/2026, suite à un crash-loop du
+// bot où le site n'affichait plus rien du tout pendant l'incident.
+const lastGoodCache = new Map<string, unknown>();
+
 async function getJson<T>(
   path: string,
-  options?: { headers?: Record<string, string>; revalidate?: number }
+  options?: { headers?: Record<string, string>; revalidate?: number; fallback?: boolean }
 ): Promise<T | null> {
   if (!API_BASE) return null;
-  const { headers, revalidate = REVALIDATE_DEFAULT } = options ?? {};
+  const { headers, revalidate = REVALIDATE_DEFAULT, fallback = true } = options ?? {};
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -90,10 +104,12 @@ async function getJson<T>(
       headers,
     });
     clearTimeout(timeout);
-    if (!res.ok) return null;
-    return (await res.json()) as T;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = (await res.json()) as T;
+    if (fallback) lastGoodCache.set(path, data);
+    return data;
   } catch {
-    return null;
+    return fallback ? ((lastGoodCache.get(path) as T | undefined) ?? null) : null;
   }
 }
 
@@ -222,11 +238,14 @@ function internalHeaders(): Record<string, string> | undefined {
 
 // Le rôle de la personne connectée pilote les vues membre/staff/admin —
 // jamais mis en cache, revérifié à chaque requête (demande du 22/07/2026),
-// contrairement au reste des données du site.
+// contrairement au reste des données du site. fallback:false volontaire :
+// servir un ancien statut admin/staff pendant une panne du bot pourrait
+// accorder ou retirer un accès à tort (voir lastGoodCache plus haut).
 export function getDiscordMember(discordId: string) {
   return getJson<ApiDiscordMember>(`/api/member/${encodeURIComponent(discordId)}`, {
     headers: internalHeaders(),
     revalidate: REVALIDATE_REALTIME,
+    fallback: false,
   });
 }
 
