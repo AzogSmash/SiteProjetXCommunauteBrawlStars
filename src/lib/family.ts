@@ -540,6 +540,42 @@ export async function getSeasonHistory(): Promise<SeasonArchiveSummary[] | null>
     .sort((a, b) => (a.id < b.id ? 1 : -1));
 }
 
+// Classement complet (tous les joueurs, pas juste le top pusher) d'une
+// saison déjà archivée côté bot — équivalent web de !evo → sélecteur de
+// saison → saison passée. null si le mois demandé n'a pas été archivé
+// (saison en cours, mois inexistant, ou pas encore synchronisé).
+export async function getSeasonArchiveLeaderboard(month: string): Promise<Player[] | null> {
+  const archive = await getFamilySeasonArchive(month);
+  if (!archive) return null;
+
+  return Object.entries(archive)
+    .map(([tag, p]) => ({ tag, ...p }))
+    .sort((a, b) => b.delta - a.delta)
+    .map((p, i) => ({
+      rank: i + 1,
+      tag: p.tag,
+      name: p.name,
+      club: p.club,
+      trophies: `${p.delta >= 0 ? "+" : ""}${formatNumber(p.delta)}`,
+      color: colorFromSeed(p.tag),
+    }));
+}
+
+// Libellé + vainqueur d'une saison archivée, pour l'en-tête de sa page —
+// même donnée que getSeasonHistory mais pour un seul mois (évite de
+// refaire l'appel Promise.all sur toutes les saisons juste pour l'en-tête).
+export async function getSeasonArchiveInfo(month: string): Promise<{ label: string; topPlayer: string; topPlayerDelta: string } | null> {
+  const archive = await getFamilySeasonArchive(month);
+  if (!archive) return null;
+  const entries = Object.values(archive);
+  const topMover = entries.slice().sort((a, b) => b.delta - a.delta)[0];
+  return {
+    label: monthLabel(month),
+    topPlayer: topMover?.name ?? "—",
+    topPlayerDelta: topMover ? `${topMover.delta >= 0 ? "+" : ""}${formatNumber(topMover.delta)}` : "",
+  };
+}
+
 export type PlayerProfile = {
   tag: string;
   name: string;

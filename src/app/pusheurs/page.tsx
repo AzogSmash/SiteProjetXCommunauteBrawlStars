@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Crown } from "lucide-react";
+import Link from "next/link";
+import { Crown, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { PushArrow } from "@/components/PushArrow";
@@ -121,22 +122,26 @@ export default async function PusheursPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {history.map((s) => (
-                <div
+                <Link
                   key={s.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 sm:flex-row sm:items-center sm:justify-between"
+                  href={`/pusheurs/${s.id}`}
+                  className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-primary/40 hover:bg-surface-2 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <p className="font-display text-base font-bold uppercase tracking-wide">
                     {s.label}
                   </p>
-                  <div className="flex items-center gap-2 text-sm font-medium text-foreground/90">
-                    <Crown size={16} className="text-primary-2" />
-                    {s.topPlayer}
-                    <span className="flex items-center gap-1 text-primary-2">
-                      {s.topPlayerDelta}
-                      {s.topPlayerDelta && <PushArrow value={s.topPlayerDelta} size={14} />}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-foreground/90">
+                      <Crown size={16} className="text-primary-2" />
+                      {s.topPlayer}
+                      <span className="flex items-center gap-1 text-primary-2">
+                        {s.topPlayerDelta}
+                        {s.topPlayerDelta && <PushArrow value={s.topPlayerDelta} size={14} />}
+                      </span>
+                    </div>
+                    <ChevronRight size={16} className="shrink-0 text-muted" />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
